@@ -58,6 +58,7 @@ static inline bool try_to_freeze_nowarn(void)
  * If try_to_freeze causes a lockdep warning it means the caller may deadlock
  */
 static inline bool try_to_freeze_unsafe(void)
+static inline bool try_to_freeze(void)
 {
 /* This causes problems for ARM targets and is a known
  * problem upstream.
