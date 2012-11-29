@@ -348,6 +348,8 @@ asmlinkage void __cpuinit secondary_start_kernel(void)
 
 	cpu_init();
 
+	cpu_init();
+
 	pr_debug("CPU%u: Booted secondary processor\n", cpu);
 
 	preempt_disable();
