@@ -366,9 +366,6 @@ static __always_inline void __assign_once_size(volatile void *p, void *res, int 
 #ifndef __compiletime_error
 # define __compiletime_error(message)
 #endif
-#ifndef __linktime_error
-# define __linktime_error(message)
-#endif
 #define compiletime_assert_atomic_type(t)				\
 	compiletime_assert(__native_word(t),				\
 		"Need native word sized stores/loads for atomicity.")
