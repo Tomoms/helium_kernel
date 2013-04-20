@@ -6,6 +6,7 @@
 #include <linux/mutex.h>
 #include <linux/spinlock.h>
 #include <linux/stop_machine.h>
+#include <linux/tick.h>
 
 #include "cpupri.h"
 #include "cpudeadline.h"
@@ -1410,6 +1411,16 @@ static inline void inc_nr_running(struct rq *rq)
 	rq->nr_last_stamp = rq->clock_task;
 	rq->nr_running++;
 	write_seqcount_end(&rq->ave_seqcnt);
+
+#ifdef CONFIG_NO_HZ_FULL
+	if (rq->nr_running == 2) {
+		if (tick_nohz_full_cpu(rq->cpu)) {
+			/* Order rq->nr_running write against the IPI */
+			smp_wmb();
+			smp_send_reschedule(rq->cpu);
+		}
+       }
+#endif
 }
 
 static inline void dec_nr_running(struct rq *rq)
