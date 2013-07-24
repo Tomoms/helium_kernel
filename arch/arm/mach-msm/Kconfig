@@ -2667,4 +2667,10 @@ config CPU_OVERCLOCK
 	help
 		Boost the MSM8960AB SoC to higher frequencies.
 
+config CPU_VOLTAGE_TABLE
+	bool "Enable CPU Voltage Table via sysfs for adjustements"
+	default n
+	help
+	  Krait User Votlage Control
+
 endif
