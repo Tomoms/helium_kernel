@@ -1103,6 +1103,7 @@ void ion_client_destroy(struct ion_client *client)
 						     node);
 		ion_handle_destroy(&handle->ref);
 	}
+
 	down_write(&dev->lock);
 	if (client->task)
 		put_task_struct(client->task);
