@@ -4155,7 +4155,8 @@ int sched_setscheduler(struct task_struct *p, int policy,
 {
 	struct sched_attr attr = {
 		.sched_policy   = policy,
-		.sched_priority = param->sched_priority
+		.sched_priority = param->sched_priority,
+		.sched_nice	= PRIO_TO_NICE(p->static_prio),
 	};
 	return __sched_setscheduler(p, &attr, true);
 }
@@ -4183,7 +4184,8 @@ int sched_setscheduler_nocheck(struct task_struct *p, int policy,
 {
 	struct sched_attr attr = {
 		.sched_policy   = policy,
-		.sched_priority = param->sched_priority
+		.sched_priority = param->sched_priority,
+		.sched_nice	= PRIO_TO_NICE(p->static_prio),
 	};
 	return __sched_setscheduler(p, &attr, false);
 }
