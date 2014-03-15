@@ -8,6 +8,7 @@
 
 extern __read_mostly int scheduler_running;
 
+extern unsigned int sysctl_sched_ravg_window;
 /*
  * Helpers for converting nanosecond timing to jiffy resolution
  */
