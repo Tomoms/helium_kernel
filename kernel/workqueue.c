@@ -44,7 +44,6 @@
 #include <linux/bug.h>
 #include <linux/moduleparam.h>
 #include <linux/hashtable.h>
-#include <linux/moduleparam.h>
 
 #include "workqueue_sched.h"
 
@@ -880,7 +879,8 @@ static struct worker *find_worker_executing_work(struct global_cwq *gcwq,
 	struct hlist_node *tmp;
 
 	hash_for_each_possible(gcwq->busy_hash, worker, tmp, hentry, (unsigned long)work)
-		if (worker->current_work == work)
+		if (worker->current_work == work &&
+		    worker->current_func == work->func)
 			return worker;
 
 	return NULL;
