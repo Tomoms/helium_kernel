@@ -3534,7 +3534,11 @@ EXPORT_SYMBOL(vfs_unlink);
 static long do_unlinkat(int dfd, const char __user *pathname)
 {
 	int error;
+<<<<<<< HEAD
 	struct filename *name;
+=======
+	char *name = NULL;
+>>>>>>> 09eb26722f1d... Fixes to kernel code inits after checking build with -O3
 	struct dentry *dentry;
 	struct nameidata nd;
 	struct inode *inode = NULL;
@@ -3632,7 +3636,11 @@ SYSCALL_DEFINE3(symlinkat, const char __user *, oldname,
 		int, newdfd, const char __user *, newname)
 {
 	int error;
+<<<<<<< HEAD
 	struct filename *from;
+=======
+	char *from = NULL;
+>>>>>>> 09eb26722f1d... Fixes to kernel code inits after checking build with -O3
 	struct dentry *dentry;
 	struct path path;
 
@@ -3950,8 +3958,13 @@ SYSCALL_DEFINE4(renameat, int, olddfd, const char __user *, oldname,
 	struct dentry *old_dentry, *new_dentry;
 	struct dentry *trap;
 	struct nameidata oldnd, newnd;
+<<<<<<< HEAD
 	struct filename *from;
 	struct filename *to;
+=======
+	char *from = NULL;
+	char *to = NULL;
+>>>>>>> 09eb26722f1d... Fixes to kernel code inits after checking build with -O3
 	int error;
 
 	from = user_path_parent(olddfd, oldname, &oldnd);
