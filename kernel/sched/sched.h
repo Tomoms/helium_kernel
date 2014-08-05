@@ -12,6 +12,9 @@
 
 extern __read_mostly int scheduler_running;
 
+extern unsigned int max_possible_freq;
+extern unsigned int min_max_freq;
+
 /*
  * Helpers for converting nanosecond timing to jiffy resolution
  */
@@ -582,7 +585,11 @@ struct rq {
 	u64 max_idle_balance_cost;
 #endif
 
-	int cur_freq, max_freq, min_freq;
+	/*
+	 * max_freq = user or thermal defined maximum
+	 * max_possible_freq = maximum supported by hardware
+	 */
+	unsigned int cur_freq, max_freq, min_freq, max_possible_freq;
 	u64 cumulative_runnable_avg;
 
 #ifdef CONFIG_IRQ_TIME_ACCOUNTING
