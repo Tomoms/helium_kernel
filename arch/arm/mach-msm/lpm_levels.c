@@ -145,6 +145,7 @@ static void *msm_lpm_lowest_limits(bool from_idle,
 
 	return best_level ? &best_level->rs_limits : NULL;
 }
+
 static struct msm_pm_sleep_ops msm_lpm_ops = {
 	.lowest_limits = msm_lpm_lowest_limits,
 	.enter_sleep = msm_lpm_enter_sleep,
