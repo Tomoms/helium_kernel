@@ -410,14 +410,14 @@ static void __get_extended_control(u32 extended,
 static inline void l2cap_ertm_stop_ack_timer(struct l2cap_pinfo *pi)
 {
 	BT_DBG("pi %pK", pi);
-	__cancel_delayed_work(&pi->ack_work);
+	cancel_delayed_work(&pi->ack_work);
 }
 
 static inline void l2cap_ertm_start_ack_timer(struct l2cap_pinfo *pi)
 {
 	BT_DBG("pi %pK, pending %d", pi, delayed_work_pending(&pi->ack_work));
 	if (!delayed_work_pending(&pi->ack_work)) {
-		queue_delayed_work(_l2cap_wq, &pi->ack_work,
+		mod_delayed_work(_l2cap_wq, &pi->ack_work,
 				msecs_to_jiffies(L2CAP_DEFAULT_ACK_TO));
 	}
 }
@@ -425,15 +425,14 @@ static inline void l2cap_ertm_start_ack_timer(struct l2cap_pinfo *pi)
 static inline void l2cap_ertm_stop_retrans_timer(struct l2cap_pinfo *pi)
 {
 	BT_DBG("pi %pK", pi);
-	__cancel_delayed_work(&pi->retrans_work);
+	cancel_delayed_work(&pi->retrans_work);
 }
 
 static inline void l2cap_ertm_start_retrans_timer(struct l2cap_pinfo *pi)
 {
 	BT_DBG("pi %pK", pi);
 	if (!delayed_work_pending(&pi->monitor_work) && pi->retrans_timeout) {
-		__cancel_delayed_work(&pi->retrans_work);
-		queue_delayed_work(_l2cap_wq, &pi->retrans_work,
+		mod_delayed_work(_l2cap_wq, &pi->retrans_work,
 			msecs_to_jiffies(pi->retrans_timeout));
 	}
 }
@@ -441,16 +440,15 @@ static inline void l2cap_ertm_start_retrans_timer(struct l2cap_pinfo *pi)
 static inline void l2cap_ertm_stop_monitor_timer(struct l2cap_pinfo *pi)
 {
 	BT_DBG("pi %pK", pi);
-	__cancel_delayed_work(&pi->monitor_work);
+	cancel_delayed_work(&pi->monitor_work);
 }
 
 static inline void l2cap_ertm_start_monitor_timer(struct l2cap_pinfo *pi)
 {
 	BT_DBG("pi %pK", pi);
 	l2cap_ertm_stop_retrans_timer(pi);
-	__cancel_delayed_work(&pi->monitor_work);
 	if (pi->monitor_timeout) {
-		queue_delayed_work(_l2cap_wq, &pi->monitor_work,
+		mod_delayed_work(_l2cap_wq, &pi->monitor_work,
 				msecs_to_jiffies(pi->monitor_timeout));
 	}
 }
@@ -605,9 +603,9 @@ void l2cap_chan_del(struct sock *sk, int err)
 
 		skb_queue_purge(SREJ_QUEUE(sk));
 
-		__cancel_delayed_work(&l2cap_pi(sk)->ack_work);
-		__cancel_delayed_work(&l2cap_pi(sk)->retrans_work);
-		__cancel_delayed_work(&l2cap_pi(sk)->monitor_work);
+		cancel_delayed_work(&l2cap_pi(sk)->ack_work);
+		cancel_delayed_work(&l2cap_pi(sk)->retrans_work);
+		cancel_delayed_work(&l2cap_pi(sk)->monitor_work);
 	}
 }
 
@@ -823,9 +821,9 @@ void l2cap_send_disconn_req(struct l2cap_conn *conn, struct sock *sk, int err)
 	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
 		skb_queue_purge(SREJ_QUEUE(sk));
 
-		__cancel_delayed_work(&l2cap_pi(sk)->ack_work);
-		__cancel_delayed_work(&l2cap_pi(sk)->retrans_work);
-		__cancel_delayed_work(&l2cap_pi(sk)->monitor_work);
+		cancel_delayed_work(&l2cap_pi(sk)->ack_work);
+		cancel_delayed_work(&l2cap_pi(sk)->retrans_work);
+		cancel_delayed_work(&l2cap_pi(sk)->monitor_work);
 	}
 
 	req.dcid = cpu_to_le16(l2cap_pi(sk)->dcid);
@@ -4673,9 +4671,9 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
 		if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
 			skb_queue_purge(SREJ_QUEUE(sk));
 
-			__cancel_delayed_work(&l2cap_pi(sk)->ack_work);
-			__cancel_delayed_work(&l2cap_pi(sk)->retrans_work);
-			__cancel_delayed_work(&l2cap_pi(sk)->monitor_work);
+			cancel_delayed_work(&l2cap_pi(sk)->ack_work);
+			cancel_delayed_work(&l2cap_pi(sk)->retrans_work);
+			cancel_delayed_work(&l2cap_pi(sk)->monitor_work);
 		}
 	}
 
