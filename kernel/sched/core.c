@@ -3148,7 +3148,6 @@ unsigned long this_cpu_load(void)
 	return this->cpu_load[0];
 }
 
-
 /*
  * Global load-average calculations
  *
