@@ -485,7 +485,6 @@ static ssize_t store_##file_name					\
 	policy->user_policy.min = new_policy.min;			\
 	policy->user_policy.max = new_policy.max;			\
 									\
-	policy->user_policy.object = new_policy.object;			\
 	ret = cpufreq_set_policy(policy, &new_policy);			\
 									\
 	return ret ? ret : count;					\
