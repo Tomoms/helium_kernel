@@ -105,7 +105,8 @@ static struct kprobe_blackpoint kprobe_blacklist[] = {
 	{NULL}    /* Terminator */
 };
 
-/* it can take some time ( > 100ms ) to initialise the
+/*
+ * it can take some time ( > 100ms ) to initialize the
  * blacklist so we delay this until we actually need it
  */
 static void init_kprobe_blacklist(void)
@@ -117,7 +118,6 @@ static void init_kprobe_blacklist(void)
 	void *addr;
 	struct kprobe_blackpoint *kb;
 
-	printk(KERN_INFO "Initialising kprobe blacklist");
 	/*
 	 * Lookup and populate the kprobe_blacklist.
 	 *
@@ -146,8 +146,8 @@ static void init_kprobe_blacklist(void)
 			kprobe_lookup_name(kretprobe_blacklist[i].name,
 					   kretprobe_blacklist[i].addr);
 			if (!kretprobe_blacklist[i].addr)
-				printk("kretprobe: lookup failed: %s\n",
-				       kretprobe_blacklist[i].name);
+				printk(KERN_ERR "kretprobe:lookup failed: %s\n",
+					kretprobe_blacklist[i].name);
 		}
 	}
 	kprobe_blacklist_initialized = 1;
