@@ -1228,8 +1228,18 @@ static ssize_t debug_read_status(struct file *file, char __user *ubuf,
 	if (!ui_dev)
 		return -EINVAL;
 
+	if (!ui_dev) {
+		printk(KERN_ERR "usb: ui_dev is NULL !!\n");
+		return -EINVAL;
+	}
+
 	tty = ui_dev->port_tty;
 	gser = ui_dev->port_usb;
+
+	if(!tty || !gser) {
+		printk(KERN_ERR "usb: tty or gser is NULL !!\n");
+		return -EINVAL;
+	}
 
 	buf = kzalloc(sizeof(char) * BUF_SIZE, GFP_KERNEL);
 	if (!buf)
