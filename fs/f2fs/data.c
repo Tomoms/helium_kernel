@@ -1716,7 +1716,11 @@ static int f2fs_write_end(struct file *file,
 }
 
 static ssize_t check_direct_IO(struct inode *inode, int rw,
+#ifdef CONFIG_AIO_OPTIMIZATION
+		struct iov_iter *iter, loff_t offset)
+#else
 		const struct iovec *iov, loff_t offset, unsigned long nr_segs)
+#endif
 {
 	unsigned blocksize_mask = inode->i_sb->s_blocksize - 1;
 	int seg, i;
@@ -1728,8 +1732,12 @@ static ssize_t check_direct_IO(struct inode *inode, int rw,
 	if (offset & blocksize_mask)
 		return -EINVAL;
 
-	/* Check the memory alignment.  Blocks cannot straddle pages */
+#ifdef CONFIG_AIO_OPTIMIZATION
+	for (seg = 0; seg < iter->nr_segs; seg++) {
+		const struct iovec *iov = iov_iter_iovec(iter);
+#else
 	for (seg = 0; seg < nr_segs; seg++) {
+#endif
 		addr = (unsigned long)iov[seg].iov_base;
 		size = iov[seg].iov_len;
 		end += size;
@@ -1745,10 +1753,18 @@ static ssize_t check_direct_IO(struct inode *inode, int rw,
 		 * iovec, if so return EINVAL, otherwise we'll get csum errors
 		 * when reading back.
 		 */
+#ifdef CONFIG_AIO_OPTIMIZATION
+		for (i = seg + 1; i < iter->nr_segs; i++) {
+			const struct iovec *iov = iov_iter_iovec(iter);
+			if (iov[seg].iov_base == iov[i].iov_base)
+				return -EINVAL;
+		}
+#else
 		for (i = seg + 1; i < nr_segs; i++) {
 			if (iov[seg].iov_base == iov[i].iov_base)
 				goto out;
 		}
+#endif
 	}
 	retval = 0;
 out:
@@ -1756,15 +1772,27 @@ out:
 }
 
 static ssize_t f2fs_direct_IO(int rw, struct kiocb *iocb,
+#ifdef CONFIG_AIO_OPTIMIZATION
+				struct iov_iter *iter, loff_t offset)
+#else
 				const struct iovec *iov, loff_t offset,
 				unsigned long nr_segs)
+#endif
 {
 	struct address_space *mapping = iocb->ki_filp->f_mapping;
 	struct inode *inode = mapping->host;
+#ifdef CONFIG_AIO_OPTIMIZATION
+	size_t count = iov_iter_count(iter);
+#else
 	size_t count = iov_length(iov, nr_segs);
+#endif
 	int err;
 
+#ifdef CONFIG_AIO_OPTIMIZATION
+	err = check_direct_IO(inode, rw, iter, offset);
+#else
 	err = check_direct_IO(inode, rw, iov, offset, nr_segs);
+#endif
 	if (err)
 		return err;
 
@@ -1772,12 +1800,18 @@ static ssize_t f2fs_direct_IO(int rw, struct kiocb *iocb,
 		return 0;
 	if (rw == WRITE && test_opt(F2FS_I_SB(inode), LFS))
 		return 0;
+#endif
 
 	trace_f2fs_direct_IO_enter(inode, offset, count, rw);
 
 	down_read(&F2FS_I(inode)->dio_rwsem[rw]);
+#ifdef CONFIG_AIO_OPTIMIZATION
+	err = blockdev_direct_IO(rw, iocb, inode, iter, offset,
+							get_data_block_dio);
+#else
 	err = blockdev_direct_IO(rw, iocb, inode, iov, offset, nr_segs,
 							get_data_block_dio);
+#endif
 	up_read(&F2FS_I(inode)->dio_rwsem[rw]);
 	if (err < 0 && (rw & WRITE)) {
 		if (err > 0)
