@@ -19,9 +19,10 @@
 #include <linux/completion.h>
 #include <linux/workqueue.h>
 #include <linux/cpumask.h>
-#include <asm/div64.h>
 #include <linux/kernel_stat.h>
 #include <linux/sched/rt.h>
+#include <asm/div64.h>
+#include <asm/cputime.h>
 
 #define CPUFREQ_NAME_LEN 16
 /* Print length for names. Extra 1 space for accomodating '\n' in prints */
@@ -504,5 +505,11 @@ static inline int cpufreq_generic_exit(struct cpufreq_policy *policy)
 	cpufreq_frequency_table_put_attr(policy->cpu);
 	return 0;
 }
+
+/*********************************************************************
+ *                         CPUFREQ STATS                             *
+ *********************************************************************/
+
+void acct_update_power(struct task_struct *p, cputime_t cputime);
 
 #endif /* _LINUX_CPUFREQ_H */
