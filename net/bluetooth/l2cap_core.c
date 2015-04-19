@@ -1283,7 +1283,7 @@ int l2cap_do_connect(struct sock *sk)
 	struct hci_conn *hcon;
 	struct hci_dev *hdev;
 	__u8 auth_type;
-	int err;
+	int err = 0;
 
 	BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
 							l2cap_pi(sk)->psm);
@@ -1635,7 +1635,7 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg,
 	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
 	struct sk_buff **frag;
 	struct sk_buff *final;
-	int err, sent = 0;
+	int err = 0, sent = 0;
 
 	BT_DBG("sk %pK, msg %pK, len %d, count %d, skb %pK", sk,
 		msg, (int)len, (int)count, skb);
@@ -1737,7 +1737,7 @@ struct sk_buff *l2cap_create_connless_pdu(struct sock *sk, struct msghdr *msg, s
 {
 	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
 	struct sk_buff *skb;
-	int err, count, hlen = L2CAP_HDR_SIZE + 2;
+	int err = 0, count = 0, hlen = L2CAP_HDR_SIZE + 2;
 	struct l2cap_hdr *lh;
 
 	BT_DBG("sk %pK len %d", sk, (int)len);
@@ -1766,7 +1766,7 @@ struct sk_buff *l2cap_create_basic_pdu(struct sock *sk, struct msghdr *msg, size
 {
 	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
 	struct sk_buff *skb;
-	int err, count, hlen = L2CAP_HDR_SIZE;
+	int err = 0, count = 0, hlen = L2CAP_HDR_SIZE;
 	struct l2cap_hdr *lh;
 
 	BT_DBG("sk %pK len %d", sk, (int)len);
@@ -1795,7 +1795,7 @@ struct sk_buff *l2cap_create_iframe_pdu(struct sock *sk,
 					u16 sdulen, int reseg)
 {
 	struct sk_buff *skb;
-	int err, count, hlen;
+	int err = 0, count = 0, hlen = 0;
 	int reserve = 0;
 	struct l2cap_hdr *lh;
 	u8 fcs = l2cap_pi(sk)->fcs;
@@ -4116,12 +4116,14 @@ done:
 	return err;
 }
 
-
 static inline int l2cap_command_rej(struct l2cap_conn *conn,
 				    struct l2cap_cmd_hdr *cmd, u16 cmd_len,
 				    u8 *data)
 {
 	struct l2cap_cmd_rej *rej = (struct l2cap_cmd_rej *) data;
+
+	if (cmd_len < sizeof(*rej))
+		return -EPROTO;
 
 	if (rej->reason != 0x0000)
 		return 0;
@@ -4512,7 +4514,10 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
 	u16 scid, flags, result;
 	struct sock *sk;
 	struct l2cap_pinfo *pi;
-	int len = cmd->len - sizeof(*rsp);
+	int len = cmd_len - sizeof(*rsp);
+
+	if (cmd_len < sizeof(*rsp))
+		return -EPROTO;
 
 	scid   = __le16_to_cpu(rsp->scid);
 	flags  = __le16_to_cpu(rsp->flags);
@@ -5743,9 +5748,12 @@ int l2cap_destroy_cfm(struct hci_chan *chan, u8 reason)
 }
 
 static int l2cap_sig_amp(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
-			u8 *data, struct sk_buff *skb)
+			u16 cmd_len, u8 *data, struct sk_buff *skb)
 {
 	struct l2cap_amp_signal_work *amp_work;
+
+	if (cmd_len < sizeof(struct l2cap_conn_req))
+		return -EPROTO;
 
 	amp_work = kzalloc(sizeof(*amp_work), GFP_ATOMIC);
 	if (!amp_work)
@@ -5900,7 +5908,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
 	case L2CAP_MOVE_CHAN_RSP:
 	case L2CAP_MOVE_CHAN_CFM:
 	case L2CAP_MOVE_CHAN_CFM_RSP:
-		err = l2cap_sig_amp(conn, cmd, data, skb);
+		err = l2cap_sig_amp(conn, cmd, cmd_len, data, skb);
 		break;
 	default:
 		BT_ERR("Unknown BR/EDR signaling command 0x%2.2x", cmd->code);
