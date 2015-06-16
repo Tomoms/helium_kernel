@@ -4243,7 +4243,7 @@ void sitar_mbhc_cal(struct snd_soc_codec *codec)
 void *sitar_mbhc_cal_btn_det_mp(const struct sitar_mbhc_btn_detect_cfg* btn_det,
 				const enum sitar_mbhc_btn_det_mem mem)
 {
-	void *ret = &btn_det->_v_btn_low;
+	void *ret = (char *)&btn_det->_v_btn_low;
 
 	switch (mem) {
 	case SITAR_BTN_DET_GAIN:
@@ -4261,7 +4261,7 @@ void *sitar_mbhc_cal_btn_det_mp(const struct sitar_mbhc_btn_detect_cfg* btn_det,
 		ret = NULL;
 	}
 
-	return ret;
+	return (char *)ret;
 }
 
 static s16 sitar_scale_v_micb_vddio(struct sitar_priv *sitar, int volt_val,
