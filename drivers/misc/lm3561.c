@@ -158,7 +158,7 @@ struct lm3561_drv_data {
 	int torch_current_shift;
 	int flash_current_shift;
 	int strobe_trigger_shift;
-	bool on_duty;
+	int on_duty;
 	struct mutex lock;
 	struct lm3561_reg_shadow shadow[LM3561_REG_NUM];
 };
