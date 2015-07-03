@@ -94,6 +94,9 @@ EXPORT_SYMBOL(__memzero);
 EXPORT_SYMBOL(mmioset);
 EXPORT_SYMBOL(mmiocpy);
 
+EXPORT_SYMBOL(mmioset);
+EXPORT_SYMBOL(mmiocpy);
+
 #ifdef CONFIG_MMU
 EXPORT_SYMBOL(copy_page);
 
