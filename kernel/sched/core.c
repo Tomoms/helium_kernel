@@ -86,10 +86,8 @@
 #include "../workqueue_internal.h"
 #include "../smpboot.h"
 
-#ifdef TRACE_CRAP
 #define CREATE_TRACE_POINTS
 #include <trace/events/sched.h>
-#endif
 
 static atomic_t __su_instances;
 
@@ -806,9 +804,7 @@ static void enqueue_task(struct rq *rq, struct task_struct *p, int flags)
 	update_rq_clock(rq);
 	sched_info_queued(p);
 	p->sched_class->enqueue_task(rq, p, flags);
-#ifdef TRACE_CRAP
 	trace_sched_enq_deq_task(p, 1, cpumask_bits(&p->cpus_allowed)[0]);
-#endif
 	inc_cumulative_runnable_avg(rq, p);
 }
 
@@ -817,9 +813,7 @@ static void dequeue_task(struct rq *rq, struct task_struct *p, int flags)
 	update_rq_clock(rq);
 	sched_info_dequeued(p);
 	p->sched_class->dequeue_task(rq, p, flags);
-#ifdef TRACE_CRAP
 	trace_sched_enq_deq_task(p, 0, cpumask_bits(&p->cpus_allowed)[0]);
-#endif
 	dec_cumulative_runnable_avg(rq, p);
 }
 
@@ -1228,10 +1222,8 @@ compute_demand:
 		if (p->sched_class == &fair_sched_class)
 			inc_nr_big_small_task(rq, p);
 	}
-#ifdef TRACE_CRAP
 	trace_sched_update_history(rq, p, runtime, samples, update_sum,
 				   new_window, event);
-#endif
 }
 
 static int __init set_sched_ravg_window(char *str)
@@ -1373,9 +1365,7 @@ static void update_task_ravg(struct task_struct *p, struct rq *rq,
 	if (event == PICK_NEXT_TASK && !p->ravg.sum)
 		rq->curr_runnable_sum += p->ravg.partial_demand;
 
-#ifdef TRACE_CRAP
 	trace_sched_update_task_ravg(p, rq, event, wallclock);
-#endif
 
 	p->ravg.mark_start = wallclock;
 }
@@ -1795,10 +1785,8 @@ static void fixup_busy_time(struct task_struct *p, int new_cpu)
 	BUG_ON((int)src_rq->prev_runnable_sum < 0);
 	BUG_ON((int)src_rq->curr_runnable_sum < 0);
 
-#ifdef TRACE_CRAP
 	trace_sched_migration_update_sum(src_rq);
 	trace_sched_migration_update_sum(dest_rq);
-#endif
 
 	if (p->state == TASK_WAKING)
 		double_rq_unlock(src_rq, dest_rq);
@@ -1875,9 +1863,7 @@ void set_task_cpu(struct task_struct *p, unsigned int new_cpu)
 #endif
 #endif
 
-#ifdef TRACE_CRAP
 	trace_sched_migrate_task(p, new_cpu, pct_task_load(p));
-#endif
 
 	if (task_cpu(p) != new_cpu) {
 		struct task_migration_notifier tmn;
@@ -1963,9 +1949,7 @@ unsigned long wait_task_inactive(struct task_struct *p, long match_state)
 		 * just go back and repeat.
 		 */
 		rq = task_rq_lock(p, &flags);
-#ifdef TRACE_CRAP
 		trace_sched_wait_task(p);
-#endif
 		running = task_running(rq, p);
 		on_rq = p->on_rq;
 		ncsw = 0;
@@ -2207,9 +2191,7 @@ static void
 ttwu_do_wakeup(struct rq *rq, struct task_struct *p, int wake_flags)
 {
 	check_preempt_curr(rq, p, wake_flags);
-#ifdef TRACE_CRAP
 	trace_sched_wakeup(p, true);
-#endif
 
 	p->state = TASK_RUNNING;
 #ifdef CONFIG_SMP
@@ -2846,9 +2828,7 @@ void wake_up_new_task(struct task_struct *p)
 #endif
 	activate_task(rq, p, 0);
 	p->on_rq = 1;
-#ifdef TRACE_CRAP
 	trace_sched_wakeup_new(p, true);
-#endif
 	check_preempt_curr(rq, p, WF_FORK);
 #ifdef CONFIG_SMP
 	if (p->sched_class->task_woken)
@@ -2937,9 +2917,7 @@ prepare_task_switch(struct rq *rq, struct task_struct *prev,
 	fire_sched_out_preempt_notifiers(prev, next);
 	prepare_lock_switch(rq, next);
 	prepare_arch_switch(next);
-#ifdef TRACE_CRAP
 	trace_sched_switch(prev, next);
-#endif
 }
 
 /**
@@ -4646,9 +4624,7 @@ void rt_mutex_setprio(struct task_struct *p, int prio)
 		goto out_unlock;
 	}
 
-#ifdef TRACE_CRAP
 	trace_sched_pi_setprio(p, prio);
-#endif
 	p->pi_top_task = rt_mutex_get_top_task(p);
 	oldprio = p->prio;
 	prev_class = p->sched_class;
