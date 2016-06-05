@@ -2652,4 +2652,11 @@ config HAS_MACH_MEMUTILS
 	bool "Motorola MSM memcpy enhancements"
 	help
 	Faster memcpy performance for Krait
+
+config CPU_OVERCLOCK
+	bool "CPU overclock"
+	default n
+	help
+		Boost the MSM8960AB SoC to higher frequencies.
+
 endif
