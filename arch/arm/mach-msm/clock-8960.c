@@ -3530,6 +3530,9 @@ static struct clk_freq_tbl clk_tbl_gfx3d[] = {
 	F_GFX3D(320000000, pll2,  2,  5),
 	F_GFX3D(400000000, pll2,  1,  2),
 	F_GFX3D(450000000, pll15, 1,  2),
+#ifdef CONFIG_GPU_OVERCLOCK
+	F_GFX3D(480000000, pll2,  6,  10),
+#endif
 	F_END
 };
 
@@ -3551,6 +3554,9 @@ static struct clk_freq_tbl clk_tbl_gfx3d_8960[] = {
 	F_GFX3D(300000000, pll3, 1,  4),
 	F_GFX3D(320000000, pll2, 2,  5),
 	F_GFX3D(400000000, pll2, 1,  2),
+#ifdef CONFIG_GPU_OVERCLOCK
+	F_GFX3D(480000000, pll2, 6,  10),
+#endif
 	F_END
 };
 
@@ -3579,25 +3585,25 @@ static struct clk_freq_tbl clk_tbl_gfx3d_8930ab[] = {
 static unsigned long fmax_gfx3d_8064ab[VDD_DIG_NUM] = {
 	[VDD_DIG_LOW]     = 128000000,
 	[VDD_DIG_NOMINAL] = 325000000,
-	[VDD_DIG_HIGH]    = 450000000
+	[VDD_DIG_HIGH]    = 480000000
 };
 
 static unsigned long fmax_gfx3d_8064[VDD_DIG_NUM] = {
 	[VDD_DIG_LOW]     = 128000000,
 	[VDD_DIG_NOMINAL] = 325000000,
-	[VDD_DIG_HIGH]    = 400000000
+	[VDD_DIG_HIGH]    = 480000000
 };
 
 static unsigned long fmax_gfx3d_8930[VDD_DIG_NUM] = {
 	[VDD_DIG_LOW]     = 192000000,
 	[VDD_DIG_NOMINAL] = 320000000,
-	[VDD_DIG_HIGH]    = 400000000
+	[VDD_DIG_HIGH]    = 480000000
 };
 
 static unsigned long fmax_gfx3d_8930aa[VDD_DIG_NUM] = {
 	[VDD_DIG_LOW]     = 192000000,
 	[VDD_DIG_NOMINAL] = 320000000,
-	[VDD_DIG_HIGH]    = 450000000
+	[VDD_DIG_HIGH]    = 480000000
 };
 
 static unsigned long fmax_gfx3d_8930ab[VDD_DIG_NUM] = {
@@ -3644,8 +3650,13 @@ static struct rcg_clk gfx3d_clk = {
 	.c = {
 		.dbg_name = "gfx3d_clk",
 		.ops = &clk_ops_rcg,
+#ifdef CONFIG_GPU_OVERCLOCK
+		VDD_DIG_FMAX_MAP3(LOW,  128000000, NOMINAL, 300000000,
+				  HIGH, 480000000),
+#else
 		VDD_DIG_FMAX_MAP3(LOW,  128000000, NOMINAL, 300000000,
 				  HIGH, 400000000),
+#endif
 		CLK_INIT(gfx3d_clk.c),
 		.depends = &gmem_axi_clk.c,
 	},
@@ -6653,7 +6664,7 @@ static void __init msm8960_clock_pre_init(void)
 		pll3_clk.c.rate = 650000000;
 		gfx3d_clk.c.fmax[VDD_DIG_LOW] = 192000000;
 		gfx3d_clk.c.fmax[VDD_DIG_NOMINAL] = 325000000;
-		gfx3d_clk.c.fmax[VDD_DIG_HIGH] = 400000000;
+		gfx3d_clk.c.fmax[VDD_DIG_HIGH] = 480000000;
 		mdp_clk.freq_tbl = clk_tbl_mdp_8960ab;
 		mdp_clk.c.fmax[VDD_DIG_LOW] = 128000000;
 		mdp_clk.c.fmax[VDD_DIG_NOMINAL] = 266667000;

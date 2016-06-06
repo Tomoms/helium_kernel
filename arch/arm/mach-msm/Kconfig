@@ -2657,6 +2657,12 @@ config CPU_OVERCLOCK
 	bool "CPU overclock"
 	default n
 	help
-		Boost the MSM8960AB SoC to higher frequencies.
+		Boost the Krait 300 up to 1,998 GHz.
+
+config GPU_OVERCLOCK
+	bool "GPU overclock"
+	default n
+	help
+		Boost the Adreno 320 to 480 MHz.
 
 endif
