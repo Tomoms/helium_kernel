@@ -159,6 +159,10 @@ static int msm_cpufreq_target(struct cpufreq_policy *policy,
 	cpu_work = &per_cpu(cpufreq_work, policy->cpu);
 	cpu_work->policy = policy;
 	cpu_work->frequency = table[index].frequency;
+<<<<<<< HEAD
+=======
+	cpu_work->index = table[index].driver_data;
+>>>>>>> bba2410542d3... cpufreq: rename index as driver_data in cpufreq_frequency_table
 	cpu_work->status = -ENODEV;
 
 	cancel_work_sync(&cpu_work->work);
@@ -289,7 +293,12 @@ static int msm_cpufreq_init(struct cpufreq_policy *policy)
 	 * Call set_cpu_freq unconditionally so that when cpu is set to
 	 * online, frequency limit will always be updated.
 	 */
+<<<<<<< HEAD
 	ret = set_cpu_freq(policy, table[index].frequency);
+=======
+	ret = set_cpu_freq(policy, table[index].frequency,
+			   table[index].driver_data);
+>>>>>>> bba2410542d3... cpufreq: rename index as driver_data in cpufreq_frequency_table
 	if (ret)
 		return ret;
 	pr_debug("cpufreq: cpu%d init at %d switching to %d\n",
