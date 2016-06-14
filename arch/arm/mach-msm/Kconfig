@@ -2665,4 +2665,12 @@ config GPU_OVERCLOCK
 	help
 		Boost the Adreno 320 to 480 MHz.
 
+config ASMP
+	bool "Multi-core automatic hotplug support"
+	depends on SMP
+	default y
+	help
+	  Automatically hotplugs the multiple cpu cores on and off
+	  based on cpu load and suspend state
+
 endif
