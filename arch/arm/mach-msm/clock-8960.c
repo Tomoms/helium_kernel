@@ -1249,7 +1249,7 @@ static struct branch_clk vcap_p_clk = {
 		.ns_reg = GPn_NS_REG(n), \
 		.md_reg = GPn_MD_REG(n), \
 		.root_en_mask = BIT(11), \
-		.ns_mask = (BM(23, 16) | BM(6, 0)), \
+		.ns_mask = (unsigned long) (BM(23, 16) | BM(6, 0)), \
 		.mnd_en_mask = BIT(8), \
 		.set_rate = set_rate_mnd, \
 		.freq_tbl = clk_tbl_gp, \
@@ -1299,7 +1299,7 @@ static CLK_GP(gp2, 2, CLK_HALT_SFPB_MISC_STATE_REG, 5);
 		.ns_reg = GSBIn_UART_APPS_NS_REG(n), \
 		.md_reg = GSBIn_UART_APPS_MD_REG(n), \
 		.root_en_mask = BIT(11), \
-		.ns_mask = (BM(31, 16) | BM(6, 0)), \
+		.ns_mask = (unsigned long) (BM(31, 16) | BM(6, 0)), \
 		.mnd_en_mask = BIT(8), \
 		.set_rate = set_rate_mnd, \
 		.freq_tbl = clk_tbl_gsbi_uart, \
@@ -1363,7 +1363,7 @@ static CLK_GSBI_UART(gsbi12_uart, 12, CLK_HALT_CFPB_STATEC_REG, 13);
 		.ns_reg = GSBIn_QUP_APPS_NS_REG(n), \
 		.md_reg = GSBIn_QUP_APPS_MD_REG(n), \
 		.root_en_mask = BIT(11), \
-		.ns_mask = (BM(23, 16) | BM(6, 0)), \
+		.ns_mask = (unsigned long) (BM(23, 16) | BM(6, 0)), \
 		.mnd_en_mask = BIT(8), \
 		.set_rate = set_rate_mnd, \
 		.freq_tbl = clk_tbl_gsbi_qup, \
@@ -1507,7 +1507,7 @@ static struct rcg_clk prng_clk = {
 		.ns_reg = SDCn_APPS_CLK_NS_REG(n), \
 		.md_reg = SDCn_APPS_CLK_MD_REG(n), \
 		.root_en_mask = BIT(11), \
-		.ns_mask = (BM(23, 16) | BM(6, 0)), \
+		.ns_mask = (unsigned long) (BM(23, 16) | BM(6, 0)), \
 		.mnd_en_mask = BIT(8), \
 		.set_rate = set_rate_mnd, \
 		.freq_tbl = clk_tbl_sdc, \
@@ -1633,7 +1633,7 @@ static struct rcg_clk tssc_clk = {
 	.ns_reg = USB_HS##n##_XCVR_FS_CLK_NS_REG, \
 	.md_reg = USB_HS##n##_XCVR_FS_CLK_MD_REG, \
 	.root_en_mask = BIT(11), \
-	.ns_mask = (BM(23, 16) | BM(6, 0)), \
+	.ns_mask = (unsigned long) (BM(23, 16) | BM(6, 0)), \
 	.mnd_en_mask = BIT(8), \
 	.set_rate = set_rate_mnd, \
 	.freq_tbl = clk_tbl_usb, \
@@ -1800,7 +1800,7 @@ static struct branch_clk usb_phy0_clk = {
 		}, \
 		.md_reg = USB_FSn_XCVR_FS_CLK_MD_REG(n), \
 		.root_en_mask = BIT(11), \
-		.ns_mask = (BM(23, 16) | BM(6, 0)), \
+		.ns_mask = (unsigned long) (BM(23, 16) | BM(6, 0)), \
 		.mnd_en_mask = BIT(8), \
 		.set_rate = set_rate_mnd, \
 		.freq_tbl = clk_tbl_usb, \
@@ -3408,6 +3408,9 @@ static struct clk_freq_tbl clk_tbl_gfx2d[] = {
 	F_GFX2D(177778000, pll2, 2,  9),
 	F_GFX2D(200000000, pll2, 1,  4),
 	F_GFX2D(228571000, pll2, 2,  7),
+#ifdef CONFIG_GPU_OVERCLOCK
+	F_GFX2D(266667000, pll2, 1,  3),
+#endif
 	F_END
 };
 
@@ -3450,8 +3453,13 @@ static struct rcg_clk gfx2d0_clk = {
 		.dbg_name = "gfx2d0_clk",
 		.ops = &clk_ops_rcg,
 		.flags = CLKFLAG_SKIP_HANDOFF,
+#ifdef CONFIG_GPU_OVERCLOCK
+		VDD_DIG_FMAX_MAP3(LOW,  100000000, NOMINAL, 200000000,
+				  HIGH, 266667000),
+#else
 		VDD_DIG_FMAX_MAP3(LOW,  100000000, NOMINAL, 200000000,
 				  HIGH, 228571000),
+#endif
 		CLK_INIT(gfx2d0_clk.c),
 	},
 };
@@ -3495,8 +3503,13 @@ static struct rcg_clk gfx2d1_clk = {
 		.dbg_name = "gfx2d1_clk",
 		.ops = &clk_ops_rcg,
 		.flags = CLKFLAG_SKIP_HANDOFF,
+#ifdef CONFIG_GPU_OVERCLOCK
+		VDD_DIG_FMAX_MAP3(LOW,  100000000, NOMINAL, 200000000,
+				  HIGH, 266667000),
+#else
 		VDD_DIG_FMAX_MAP3(LOW,  100000000, NOMINAL, 200000000,
 				  HIGH, 228571000),
+#endif
 		CLK_INIT(gfx2d1_clk.c),
 	},
 };
