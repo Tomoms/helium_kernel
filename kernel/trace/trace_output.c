@@ -1085,13 +1085,9 @@ static enum print_line_t trace_graph_ret_raw(struct trace_iterator *iter, int fl
 
 	trace_assign_type(field, iter->ent);
 
-	if (!trace_seq_printf(&iter->seq, "%lx %lld %lld %ld %d\n",
-			      field->ret.func,
-			      field->ret.calltime,
-			      field->ret.rettime,
-			      field->ret.overrun,
-			      field->ret.depth));
+	if (!trace_seq_printf(&iter->seq, "%lx %lld %lld %ld %d\n", field->ret.func, field->ret.calltime, field->ret.rettime, field->ret.overrun, field->ret.depth)) {
 		return TRACE_TYPE_PARTIAL_LINE;
+	}
 
 	return TRACE_TYPE_HANDLED;
 }
