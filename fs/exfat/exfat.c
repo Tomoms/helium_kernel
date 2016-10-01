@@ -210,7 +210,6 @@ INT32 ffsMountVol(struct super_block *sb, INT32 drv)
 #if (THERE_IS_MBR == 1)
 	}
 #endif
-
 	p_pbr = (PBR_SECTOR_T *) tmp_bh->b_data;
 
 	if (GET16_A(p_pbr->signature) != PBR_SIGNATURE) {
