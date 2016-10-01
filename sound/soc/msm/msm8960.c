@@ -227,62 +227,6 @@ static void msm8960_ext_single_ended_spk_power_amp_on(u32 spk)
 	}
 }
 
-static void msm8960_ext_spk_power_amp_on(u32 spk)
-{
-	if (spk & (BOTTOM_SPK_AMP_POS | BOTTOM_SPK_AMP_NEG)) {
-
-		if ((msm8960_ext_bottom_spk_pamp & BOTTOM_SPK_AMP_POS) &&
-			(msm8960_ext_bottom_spk_pamp & BOTTOM_SPK_AMP_NEG)) {
-
-			pr_debug("%s() External Bottom Speaker Ampl already "
-				"turned on. spk = 0x%08x\n", __func__, spk);
-			return;
-		}
-
-		msm8960_ext_bottom_spk_pamp |= spk;
-
-		if ((msm8960_ext_bottom_spk_pamp & BOTTOM_SPK_AMP_POS) &&
-			(msm8960_ext_bottom_spk_pamp & BOTTOM_SPK_AMP_NEG)) {
-
-			msm8960_enable_ext_spk_amp_gpio(bottom_spk_pamp_gpio);
-			pr_debug("%s: slepping 4 ms after turning on external "
-				" Bottom Speaker Ampl\n", __func__);
-			usleep_range(4000, 4000);
-		}
-
-	} else if  (spk & (TOP_SPK_AMP_POS | TOP_SPK_AMP_NEG | TOP_SPK_AMP)) {
-
-		pr_debug("%s: top_spk_amp_state = 0x%x spk_event = 0x%x\n",
-			__func__, msm8960_ext_top_spk_pamp, spk);
-
-		if (((msm8960_ext_top_spk_pamp & TOP_SPK_AMP_POS) &&
-			(msm8960_ext_top_spk_pamp & TOP_SPK_AMP_NEG)) ||
-				(msm8960_ext_top_spk_pamp & TOP_SPK_AMP)) {
-
-			pr_debug("%s() External Top Speaker Ampl already"
-				"turned on. spk = 0x%08x\n", __func__, spk);
-			return;
-		}
-
-		msm8960_ext_top_spk_pamp |= spk;
-
-		if (((msm8960_ext_top_spk_pamp & TOP_SPK_AMP_POS) &&
-			(msm8960_ext_top_spk_pamp & TOP_SPK_AMP_NEG)) ||
-				(msm8960_ext_top_spk_pamp & TOP_SPK_AMP)) {
-
-			msm8960_enable_ext_spk_amp_gpio(top_spk_pamp_gpio);
-			pr_debug("%s: sleeping 4 ms after turning on "
-				" external Top Speaker Ampl\n", __func__);
-			usleep_range(4000, 4000);
-		}
-	} else  {
-
-		pr_err("%s: ERROR : Invalid External Speaker Ampl. spk = 0x%08x\n",
-			__func__, spk);
-		return;
-	}
-}
-
 static void msm8960_ext_single_ended_spk_power_amp_off(u32 spk)
 {
 	if (spk & BOTTOM_SPK_AMP) {
@@ -310,57 +254,6 @@ static void msm8960_ext_single_ended_spk_power_amp_off(u32 spk)
 
 		pr_debug("%s: sleeping 4 ms after turning off external Top"
 			" Spkaker Ampl\n", __func__);
-
-		usleep_range(4000, 4000);
-	} else  {
-
-		pr_err("%s: ERROR : Invalid Ext Spk Ampl. spk = 0x%08x\n",
-			__func__, spk);
-		return;
-	}
-}
-
-static void msm8960_ext_spk_power_amp_off(u32 spk)
-{
-	if (spk & (BOTTOM_SPK_AMP_POS | BOTTOM_SPK_AMP_NEG)) {
-
-		if (!msm8960_ext_bottom_spk_pamp)
-			return;
-
-		gpio_direction_output(bottom_spk_pamp_gpio, 0);
-		gpio_free(bottom_spk_pamp_gpio);
-		msm8960_ext_bottom_spk_pamp = 0;
-
-		pr_debug("%s: sleeping 4 ms after turning off external Bottom"
-			" Speaker Ampl\n", __func__);
-
-		usleep_range(4000, 4000);
-
-	} else if (spk & (TOP_SPK_AMP_POS | TOP_SPK_AMP_NEG | TOP_SPK_AMP)) {
-
-		pr_debug("%s: top_spk_amp_state = 0x%x spk_event = 0x%x\n",
-				__func__, msm8960_ext_top_spk_pamp, spk);
-
-		if (!msm8960_ext_top_spk_pamp)
-			return;
-
-		if ((spk & TOP_SPK_AMP_POS) || (spk & TOP_SPK_AMP_NEG)) {
-
-			msm8960_ext_top_spk_pamp &= (~(TOP_SPK_AMP_POS |
-							TOP_SPK_AMP_NEG));
-		} else if (spk & TOP_SPK_AMP) {
-			msm8960_ext_top_spk_pamp &=  ~TOP_SPK_AMP;
-		}
-
-		if (msm8960_ext_top_spk_pamp)
-			return;
-
-		gpio_direction_output(top_spk_pamp_gpio, 0);
-		gpio_free(top_spk_pamp_gpio);
-		msm8960_ext_top_spk_pamp = 0;
-
-		pr_debug("%s: sleeping 4 ms after ext Top Spek Ampl is off\n",
-				__func__);
 
 		usleep_range(4000, 4000);
 	} else  {
@@ -457,48 +350,6 @@ static int msm8960_single_ended_spkramp_event(struct snd_soc_dapm_widget *w,
 				BOTTOM_SPK_AMP);
 		else if (!strncmp(w->name, "Ext Spk Top", 11))
 			msm8960_ext_single_ended_spk_power_amp_off(TOP_SPK_AMP);
-		else {
-			pr_err("%s() Invalid Speaker Widget = %s\n",
-					__func__, w->name);
-			return -EINVAL;
-		}
-	}
-	return 0;
-}
-
-static int msm8960_spkramp_event(struct snd_soc_dapm_widget *w,
-	struct snd_kcontrol *k, int event)
-{
-	pr_debug("%s() %x\n", __func__, SND_SOC_DAPM_EVENT_ON(event));
-
-	if (SND_SOC_DAPM_EVENT_ON(event)) {
-		if (!strncmp(w->name, "Ext Spk Bottom Pos", 18))
-			msm8960_ext_spk_power_amp_on(BOTTOM_SPK_AMP_POS);
-		else if (!strncmp(w->name, "Ext Spk Bottom Neg", 18))
-			msm8960_ext_spk_power_amp_on(BOTTOM_SPK_AMP_NEG);
-		else if (!strncmp(w->name, "Ext Spk Top Pos", 15))
-			msm8960_ext_spk_power_amp_on(TOP_SPK_AMP_POS);
-		else if  (!strncmp(w->name, "Ext Spk Top Neg", 15))
-			msm8960_ext_spk_power_amp_on(TOP_SPK_AMP_NEG);
-		else if  (!strncmp(w->name, "Ext Spk Top", 12))
-			msm8960_ext_spk_power_amp_on(TOP_SPK_AMP);
-		else {
-			pr_err("%s() Invalid Speaker Widget = %s\n",
-					__func__, w->name);
-			return -EINVAL;
-		}
-
-	} else {
-		if (!strncmp(w->name, "Ext Spk Bottom Pos", 18))
-			msm8960_ext_spk_power_amp_off(BOTTOM_SPK_AMP_POS);
-		else if (!strncmp(w->name, "Ext Spk Bottom Neg", 18))
-			msm8960_ext_spk_power_amp_off(BOTTOM_SPK_AMP_NEG);
-		else if (!strncmp(w->name, "Ext Spk Top Pos", 15))
-			msm8960_ext_spk_power_amp_off(TOP_SPK_AMP_POS);
-		else if  (!strncmp(w->name, "Ext Spk Top Neg", 15))
-			msm8960_ext_spk_power_amp_off(TOP_SPK_AMP_NEG);
-		else if  (!strncmp(w->name, "Ext Spk Top", 12))
-			msm8960_ext_spk_power_amp_off(TOP_SPK_AMP);
 		else {
 			pr_err("%s() Invalid Speaker Widget = %s\n",
 					__func__, w->name);
@@ -608,33 +459,6 @@ static const struct snd_soc_dapm_widget blue_msm8960_dapm_widgets_no_pmic[] = {
 
 };
 
-static const struct snd_soc_dapm_widget msm8960_dapm_widgets[] = {
-
-	SND_SOC_DAPM_SUPPLY("MCLK",  SND_SOC_NOPM, 0, 0,
-	msm8960_mclk_event, SND_SOC_DAPM_PRE_PMU | SND_SOC_DAPM_POST_PMD),
-
-	SND_SOC_DAPM_SPK("Ext Spk Bottom Pos", msm8960_spkramp_event),
-	SND_SOC_DAPM_SPK("Ext Spk Bottom Neg", msm8960_spkramp_event),
-
-	SND_SOC_DAPM_SPK("Ext Spk Top Pos", msm8960_spkramp_event),
-	SND_SOC_DAPM_SPK("Ext Spk Top Neg", msm8960_spkramp_event),
-	SND_SOC_DAPM_SPK("Ext Spk Top", msm8960_spkramp_event),
-
-	SND_SOC_DAPM_MIC("Handset Mic", NULL),
-	SND_SOC_DAPM_MIC("Headset Mic", NULL),
-	SND_SOC_DAPM_MIC("Digital Mic1", NULL),
-	SND_SOC_DAPM_MIC("ANCRight Headset Mic", NULL),
-	SND_SOC_DAPM_MIC("ANCLeft Headset Mic", NULL),
-
-	SND_SOC_DAPM_MIC("Digital Mic1", NULL),
-	SND_SOC_DAPM_MIC("Digital Mic2", NULL),
-	SND_SOC_DAPM_MIC("Digital Mic3", NULL),
-	SND_SOC_DAPM_MIC("Digital Mic4", NULL),
-	SND_SOC_DAPM_MIC("Digital Mic5", NULL),
-	SND_SOC_DAPM_MIC("Digital Mic6", NULL),
-
-};
-
 static const struct snd_soc_dapm_route blue_audio_map[] = {
 
 	{"RX_BIAS", NULL, "MCLK"},
@@ -654,93 +478,6 @@ static const struct snd_soc_dapm_route blue_audio_map[] = {
 	{"AMIC3", NULL, "MIC BIAS4 External"},
 	{"MIC BIAS4 External", NULL, "Secondary Mic"},
 
-};
-
-static const struct snd_soc_dapm_route common_audio_map[] = {
-
-	{"RX_BIAS", NULL, "MCLK"},
-	{"LDO_H", NULL, "MCLK"},
-
-	/* Speaker path */
-	{"Ext Spk Bottom Pos", NULL, "LINEOUT1"},
-	{"Ext Spk Bottom Neg", NULL, "LINEOUT3"},
-
-	{"Ext Spk Top Pos", NULL, "LINEOUT2"},
-	{"Ext Spk Top Neg", NULL, "LINEOUT4"},
-	{"Ext Spk Top", NULL, "LINEOUT5"},
-
-	/* Microphone path */
-	{"AMIC1", NULL, "MIC BIAS1 Internal1"},
-	{"MIC BIAS1 Internal1", NULL, "Handset Mic"},
-
-	{"AMIC2", NULL, "MIC BIAS2 External"},
-	{"MIC BIAS2 External", NULL, "Headset Mic"},
-
-	/**
-	 * AMIC3 and AMIC4 inputs are connected to ANC microphones
-	 * These mics are biased differently on CDP and FLUID
-	 * routing entries below are based on bias arrangement
-	 * on FLUID.
-	 */
-	{"AMIC3", NULL, "MIC BIAS3 Internal1"},
-	{"MIC BIAS3 Internal1", NULL, "MIC BIAS2 External"},
-	{"MIC BIAS2 External", NULL, "ANCRight Headset Mic"},
-	{"AMIC4", NULL, "MIC BIAS1 Internal2"},
-	{"MIC BIAS1 Internal2", NULL, "MIC BIAS2 External"},
-	{"MIC BIAS2 External", NULL, "ANCLeft Headset Mic"},
-
-	{"HEADPHONE", NULL, "LDO_H"},
-
-	/**
-	 * The digital Mic routes are setup considering
-	 * fluid as default device.
-	 */
-
-	/**
-	 * Digital Mic1. Front Bottom left Digital Mic on Fluid and MTP.
-	 * Digital Mic GM5 on CDP mainboard.
-	 * Conncted to DMIC2 Input on Tabla codec.
-	 */
-	{"DMIC2", NULL, "MIC BIAS1 External"},
-	{"MIC BIAS1 External", NULL, "Digital Mic1"},
-
-	/**
-	 * Digital Mic2. Front Bottom right Digital Mic on Fluid and MTP.
-	 * Digital Mic GM6 on CDP mainboard.
-	 * Conncted to DMIC1 Input on Tabla codec.
-	 */
-	{"DMIC1", NULL, "MIC BIAS1 External"},
-	{"MIC BIAS1 External", NULL, "Digital Mic2"},
-
-	/**
-	 * Digital Mic3. Back Bottom Digital Mic on Fluid.
-	 * Digital Mic GM1 on CDP mainboard.
-	 * Conncted to DMIC4 Input on Tabla codec.
-	 */
-	{"DMIC4", NULL, "MIC BIAS3 External"},
-	{"MIC BIAS3 External", NULL, "Digital Mic3"},
-
-	/**
-	 * Digital Mic4. Back top Digital Mic on Fluid.
-	 * Digital Mic GM2 on CDP mainboard.
-	 * Conncted to DMIC3 Input on Tabla codec.
-	 */
-	{"DMIC3", NULL, "MIC BIAS3 External"},
-	{"MIC BIAS3 External", NULL, "Digital Mic4"},
-
-	/**
-	 * Digital Mic5. Front top Digital Mic on Fluid.
-	 * Digital Mic GM3 on CDP mainboard.
-	 * Conncted to DMIC5 Input on Tabla codec.
-	 */
-	{"DMIC5", NULL, "MIC BIAS4 External"},
-	{"MIC BIAS4 External", NULL, "Digital Mic5"},
-
-	/* Tabla digital Mic6 - back bottom digital Mic on Liquid and
-	 * bottom mic on CDP. FLUID/MTP do not have dmic6 installed.
-	 */
-	{"DMIC6", NULL, "MIC BIAS4 External"},
-	{"MIC BIAS4 External", NULL, "Digital Mic6"},
 };
 
 static const char *spk_function[] = {"Off", "On"};
