@@ -11,6 +11,10 @@
 #ifndef _LINUX_F2FS_FS_H
 #define _LINUX_F2FS_FS_H
 
+#ifdef CONFIG_F2FS_FS_ENCRYPTION
+#undef CONFIG_F2FS_FS_ENCRYPTION
+#endif
+
 #include <linux/pagemap.h>
 #include <linux/types.h>
 
@@ -100,6 +104,7 @@ struct f2fs_super_block {
 /*
  * For checkpoint
  */
+#define CP_CRC_RECOVERY_FLAG	0x00000040
 #define CP_FASTBOOT_FLAG	0x00000020
 #define CP_FSCK_FLAG		0x00000010
 #define CP_ERROR_FLAG		0x00000008
