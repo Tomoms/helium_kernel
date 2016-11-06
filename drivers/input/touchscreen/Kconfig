@@ -1008,4 +1008,10 @@ config TOUCHSCREEN_SYNAPTICS_DSX_FW_UPDATE
 	  To compile this driver as a module, choose M here: the
 	  module will be called synaptics_dsx_fw_update.
 
+config STATE_NOTIFIER
+	bool "State Notifier Driver"
+	default y
+	help
+	  Allows monitoring the current display state.
+
 endif
