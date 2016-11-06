@@ -28,6 +28,9 @@
  */
 
 #include "cyttsp4_mt_common.h"
+#ifdef CONFIG_STATE_NOTIFIER
+#include <linux/state_notifier.h>
+#endif
 
 static void cyttsp4_lift_all(struct cyttsp4_mt_data *md)
 {
@@ -456,6 +459,10 @@ static void cyttsp4_mt_fb_suspend(struct cyttsp4_mt_data *ts)
 
 	pm_runtime_put(dev);
 	ts->fb_suspended = true;
+
+#ifdef CONFIG_STATE_NOTIFIER
+	state_suspend();
+#endif
 }
 
 static void cyttsp4_mt_fb_resume(struct cyttsp4_mt_data *ts)
@@ -469,6 +476,10 @@ static void cyttsp4_mt_fb_resume(struct cyttsp4_mt_data *ts)
 
 	pm_runtime_get_sync(dev);
 	ts->fb_suspended = false;
+
+#ifdef CONFIG_STATE_NOTIFIER
+	state_resume();
+#endif
 }
 
 static int fb_notifier_callback(struct notifier_block *self,
