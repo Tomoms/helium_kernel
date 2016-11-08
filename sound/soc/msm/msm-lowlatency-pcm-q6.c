@@ -427,7 +427,6 @@ static int msm_pcm_playback_copy(struct snd_pcm_substream *substream, int a,
 		first_time = false;
 	}
 #endif
-
 	fbytes = frames_to_bytes(runtime, frames);
 	pr_debug("%s: prtd->out_count = %d\n",
 				__func__, atomic_read(&prtd->out_count));
