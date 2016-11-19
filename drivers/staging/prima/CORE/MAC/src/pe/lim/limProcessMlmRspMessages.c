@@ -4594,17 +4594,18 @@ limHandleDelBssInReAssocContext(tpAniSirGlobal pMac, tpDphHashNode pStaDs,tpPESe
                   (tANI_U8 *) psessionEntry->pLimReAssocReq->bssDescription.ieFields,
                   limGetIElenFromBssDescription( &psessionEntry->pLimReAssocReq->bssDescription ),
                     &beaconStruct );
-            if(pMac->lim.gLimProtectionControl != WNI_CFG_FORCE_POLICY_PROTECTION_DISABLE)
+            if (pMac->lim.gLimProtectionControl != WNI_CFG_FORCE_POLICY_PROTECTION_DISABLE) {
                 limDecideStaProtectionOnAssoc(pMac, &beaconStruct, psessionEntry);
                 if(beaconStruct.erpPresent) {
                 if (beaconStruct.erpIEInfo.barkerPreambleMode)
                     psessionEntry->beaconParams.fShortPreamble = 0;
                 else
                     psessionEntry->beaconParams.fShortPreamble = 1;
-            }
+                }
+	    }
             //updateBss flag is false, as in this case, PE is first deleting the existing BSS and then adding a new one.
-            if (eSIR_SUCCESS != limStaSendAddBss( pMac, assocRsp, &beaconStruct,
-                                                    &psessionEntry->pLimReAssocReq->bssDescription, false, psessionEntry))  {
+            if (eSIR_SUCCESS != limStaSendAddBss(pMac, assocRsp, &beaconStruct,
+                                                    &psessionEntry->pLimReAssocReq->bssDescription, false, psessionEntry)) {
                 limLog( pMac, LOGE, FL( "Posting ADDBSS in the ReAssocContext has Failed "));
                 retStatus = eSIR_FAILURE;
             }
