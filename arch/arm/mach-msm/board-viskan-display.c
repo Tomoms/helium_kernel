@@ -90,9 +90,10 @@ static int msm_fb_detect_panel(const char *name)
 	if (!strncmp(name, HDMI_PANEL_NAME,
 			strnlen(HDMI_PANEL_NAME,
 				PANEL_NAME_MAX_LEN))) {
-		if (hdmi_is_primary)
+		if (hdmi_is_primary) {
 			set_mdp_clocks_for_wuxga();
-			return 0;
+		}
+	return 0;
 	}
 
 	if (!strncmp(name, TVOUT_PANEL_NAME,

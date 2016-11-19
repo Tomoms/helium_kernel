@@ -250,8 +250,7 @@ int msm_camera_flash_led(
 				external->led_flash_en, rc);
 		if (!rc)
 			gpio_direction_output(external->led_flash_en, 0);
-
-			break;
+		break;
 
 	case MSM_CAMERA_LED_RELEASE:
 		CDBG("MSM_CAMERA_LED_RELEASE\n");

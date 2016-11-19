@@ -596,7 +596,7 @@ int32_t msm_sensor_config(struct msm_sensor_ctrl_t *s_ctrl, void __user *argp)
 					s_ctrl, cdata.cfg.vision_mode_enable);
 			else
 				rc = -EFAULT;
-				break;
+			break;
 		case CFG_SET_VISION_AE:
 			if (s_ctrl->func_tbl->sensor_set_vision_ae_control)
 				rc = s_ctrl->func_tbl->
