@@ -509,10 +509,11 @@ static void mhl_discovery_timer_work(struct work_struct *w)
 	if (mhl_state->notify_plugged) {
 		mhl_notify_unplugged(mhl_state->mhl_dev);
 		wake_unlock(&mhl_wake_lock);
-		if (mhl_state->charging_enable)
+		if (mhl_state->charging_enable) {
 			/* recover the minimum charge voltage */
 			pm8921_set_chg_vin_min(TRUE, 0);
 			mhl_state->charging_enable(FALSE, 0);
+		}
 		del_timer(&mhl_state->discovery_timer);
 		mhl_state->notify_plugged = FALSE;
 	}

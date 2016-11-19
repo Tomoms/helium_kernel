@@ -393,24 +393,24 @@ void ddl_fw_release(struct ddl_buf_addr *dram_base)
 		if (IS_ERR_OR_NULL(cookie)) {
 			pr_err("Invalid params");
 		return;
-	}
-	if (res_trk_enable_footswitch()) {
-		pr_err("Failed to enable footswitch");
-		return;
-	}
-	if (res_trk_enable_iommu_clocks()) {
-		res_trk_disable_footswitch();
-		pr_err("Failed to enable iommu clocks\n");
-		return;
-	}
-	pil_put(cookie);
-	if (res_trk_disable_iommu_clocks())
-		pr_err("Failed to disable iommu clocks\n");
-	if (res_trk_disable_footswitch())
-		pr_err("Failed to disable footswitch\n");
+		}
+		if (res_trk_enable_footswitch()) {
+			pr_err("Failed to enable footswitch");
+			return;
+		}
+		if (res_trk_enable_iommu_clocks()) {
+			res_trk_disable_footswitch();
+			pr_err("Failed to enable iommu clocks\n");
+			return;
+		}
+		pil_put(cookie);
+		if (res_trk_disable_iommu_clocks())
+			pr_err("Failed to disable iommu clocks\n");
+		if (res_trk_disable_footswitch())
+			pr_err("Failed to disable footswitch\n");
 	} else {
-	if (res_trk_check_for_sec_session())
-		res_trk_close_secure_session();
+		if (res_trk_check_for_sec_session())
+			res_trk_close_secure_session();
 		res_trk_release_fw_addr();
 	}
 }
