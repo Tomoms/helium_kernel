@@ -2188,7 +2188,7 @@ static inline void unregister_chrdev(unsigned int major, const char *name)
 }
 
 /* fs/block_dev.c */
-#define BDEVNAME_SIZE	32	/* Largest string for a blockdev identifier */
+#define BDEVNAME_SIZE	64	/* Largest string for a blockdev identifier */
 #define BDEVT_SIZE	10	/* Largest string for MAJ:MIN for blkdev */
 
 #ifdef CONFIG_BLOCK

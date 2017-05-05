@@ -2593,7 +2593,7 @@ static int msm_rotator_start(unsigned long arg,
 
 	sync_info = &msm_rotator_dev->sync_info[s];
 	if ((rc == 0) && (sync_info->initialized == false)) {
-		char timeline_name[MAX_TIMELINE_NAME_LEN];
+		char timeline_name[MAX_TIMELINE_NAME_LEN * 2];
 		if (sync_info->timeline == NULL) {
 			snprintf(timeline_name, sizeof(timeline_name),
 				"msm_rot_%d", first_free_idx);

@@ -843,7 +843,7 @@ static ssize_t hdmi_common_rda_audio_caps(struct device *dev,
 		strlcat(str, "\n", str_size);
 		strlcat(str, "Number of channels \t= ", str_size);
 
-		snprintf(t, 3, "%d", channels[i]);
+		snprintf(t, 6, "%d", channels[i]);
 		strlcat(str, t, str_size);
 
 		strlcat(str, "\n", str_size);

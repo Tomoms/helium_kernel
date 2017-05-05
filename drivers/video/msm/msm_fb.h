@@ -202,7 +202,7 @@ struct msm_fb_data_type {
 	u32 mem_hid;
 	u32 mdp_rev;
 	u32 writeback_state;
-	bool writeback_active_cnt;
+	int writeback_active_cnt;
 	bool writeback_initialized;
 	int cont_splash_done;
 #ifdef CONFIG_DEBUG_FS

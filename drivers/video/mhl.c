@@ -1355,7 +1355,7 @@ static ssize_t mhl_show_discovery(struct device *dev,
 {
 	int result;
 	mhl_device_discovery(dev_name(dev), &result);
-	return snprintf(buf, 4, "%s\n", result ? "mhl" : "usb");
+	return snprintf(buf, 8, "%s\n", result ? "mhl" : "usb");
 }
 
 static void mhl_usb_online_work(struct work_struct *work)

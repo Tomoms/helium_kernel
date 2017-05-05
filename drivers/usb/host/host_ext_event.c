@@ -19,7 +19,7 @@
 #include <linux/slab.h>
 
 #define MAX_NAME_SIZE 32
-#define MAX_MODULE_NAME_SIZE 32
+#define MAX_MODULE_NAME_SIZE 64
 #define MAX_EVENT_STRING_SIZE 35
 
 struct host_ext_event_drv {

@@ -973,7 +973,7 @@ static int __devinit tsens_tm_probe(struct platform_device *pdev)
 	}
 
 	for (i = 0; i < tmdev->tsens_num_sensor; i++) {
-		char name[18];
+		char name[36];
 		snprintf(name, sizeof(name), "tsens_tz_sensor%d", i);
 		tmdev->sensor[i].mode = THERMAL_DEVICE_ENABLED;
 		tmdev->sensor[i].sensor_num = i;
