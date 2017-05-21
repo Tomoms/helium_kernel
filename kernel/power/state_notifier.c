@@ -13,6 +13,8 @@
 #include <linux/module.h>
 #include <linux/state_notifier.h>
 #include <linux/delay.h>
+#include <linux/mutex.h>
+#include "power.h"
 
 #define DEFAULT_SUSPEND_DEFER_TIME 	10
 #define STATE_NOTIFIER			"state_notifier"
@@ -80,6 +82,15 @@ static void _suspend_work(struct work_struct *work)
 	state_suspended = true;
 	suspend_in_progress = false;
 	dprintk("%s: suspend completed.\n", STATE_NOTIFIER);
+
+	if (unlikely(!mutex_trylock(&pm_mutex))) {
+	pr_info("PM is busy. Skipping suspension\n");
+	return;
+	}
+
+	pr_info("state_notifier: calling system suspension\n");
+	pm_suspend(PM_HIBERNATION_PREPARE);
+	mutex_unlock(&pm_mutex);
 }
 
 static void _resume_work(struct work_struct *work)
@@ -98,7 +109,7 @@ void state_suspend(void)
 	dprintk("%s: suspend called.\n", STATE_NOTIFIER);
 	suspend_in_progress = true;
 
-	queue_delayed_work(susp_wq, &suspend_work, 
+	queue_delayed_work(susp_wq, &suspend_work,
 		msecs_to_jiffies(suspend_defer_time * 1000));
 }
 
