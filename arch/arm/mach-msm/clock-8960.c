@@ -572,7 +572,7 @@ static struct pll_vote_clk pll8_clk = {
 	.parent = &pxo_clk.c,
 	.c = {
 		.dbg_name = "pll8_clk",
-		.rate = 384000000,
+		.rate = 137100000,
 		.ops = &clk_ops_pll_vote,
 		CLK_INIT(pll8_clk.c),
 	},
@@ -6812,7 +6812,7 @@ static int __init msm8960_clock_late_init(void)
 	if (WARN(IS_ERR(mmfpb_a_clk), "mmfpb_a_clk not found (%ld)\n",
 			PTR_ERR(mmfpb_a_clk)))
 		return PTR_ERR(mmfpb_a_clk);
-	rc = clk_set_rate(mmfpb_a_clk, 38400000);
+	rc = clk_set_rate(mmfpb_a_clk, 13710000);
 	if (WARN(rc, "mmfpb_a_clk rate was not set (%d)\n", rc))
 		return rc;
 	rc = clk_prepare_enable(mmfpb_a_clk);
