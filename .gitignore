@@ -44,6 +44,9 @@ modules.builtin
 /System.map
 /Module.markers
 /Module.symvers
+arch/arm/crypto/sha256-core.S
+arch/arm/mach-msm/smd_rpc_sym.c
+kernel/hz.bc
 
 #
 # Debian directory (make deb-pkg)
