@@ -245,8 +245,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc
 HOSTCXX      = g++
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -fgcse-las
-HOSTCXXFLAGS = -O2 -fgcse-las
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
+HOSTCXXFLAGS = -O2
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -358,31 +358,6 @@ CFLAGS_KERNEL	=
 AFLAGS_KERNEL	=
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
-FAST_LANE_ARM_OPT := -mtune=cortex-a15 \
-	-march=armv7ve \
-	-mfpu=neon-vfpv4 \
-	-marm \
-	-munaligned-access \
-	-mvectorize-with-neon-quad
-
-FAST_LANE_OPT_FLAGS := -g0 \
-	-DNDEBUG \
-	-ffast-math \
-	-fforce-addr \
-	-fgcse-after-reload \
-	-fgcse-las \
-	-fgcse-sm \
-	-fivopts \
-	-fno-strict-aliasing \
-	-fomit-frame-pointer \
-	-fpredictive-commoning \
-	-fsingle-precision-constant \
-	-fsched-spec-load \
-	-fsched-spec-load-dangerous \
-	-ftree-partial-pre \
-	-ftree-vectorize \
-	-funsafe-math-optimizations \
-	$(FAST_LANE_ARM_OPT)
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
 # Needed to be compatible with the O= option
@@ -398,11 +373,10 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
 		   -fno-delete-null-pointer-checks \
-		   -Wno-maybe-uninitialized \
-		   $(FAST_LANE_OPT_FLAGS)
+		   -Wno-maybe-uninitialized
 
-KBUILD_AFLAGS_KERNEL := $(FAST_LANE_OPT_FLAGS)
-KBUILD_CFLAGS_KERNEL := $(FAST_LANE_OPT_FLAGS)
+KBUILD_AFLAGS_KERNEL :=
+KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS   := -D__ASSEMBLY__
 KBUILD_AFLAGS_MODULE  := -DMODULE
 KBUILD_CFLAGS_MODULE  := -DMODULE -fno-pic
@@ -627,7 +601,7 @@ endif
 KBUILD_CFLAGS   += $(call cc-option, -fno-var-tracking-assignments)
 
 ifdef CONFIG_DEBUG_INFO
-KBUILD_CFLAGS	+= -gdwarf-2
+KBUILD_CFLAGS	+= -g
 KBUILD_AFLAGS	+= -gdwarf-2
 endif
 
