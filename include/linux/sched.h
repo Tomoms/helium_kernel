@@ -1909,8 +1909,6 @@ extern unsigned long sched_get_busy(int cpu);
 	static inline void task_clear_##func(struct task_struct *p)	\
 	{ clear_bit(PFA_##name, &p->atomic_flags); }
 
-#define PFA_NO_NEW_PRIVS 0x00000001	/* May not gain new privileges. */
-
 static inline bool task_no_new_privs(struct task_struct *p)
 {
 	return test_bit(PFA_NO_NEW_PRIVS, &p->atomic_flags);
@@ -2018,14 +2016,6 @@ void calc_load_exit_idle(void);
 static inline void calc_load_enter_idle(void) { }
 static inline void calc_load_exit_idle(void) { }
 #endif /* CONFIG_NO_HZ_COMMON */
-
-static inline void set_wake_up_idle(bool enabled)
-{
-	if (enabled)
-		current->flags |= PF_WAKE_UP_IDLE;
-	else
-		current->flags &= ~PF_WAKE_UP_IDLE;
-}
 
 #ifdef CONFIG_SCHED_HMP
 extern int sched_set_boost(int enable);

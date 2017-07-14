@@ -176,7 +176,7 @@ void update_rq_clock(struct rq *rq)
 #define SCHED_FEAT(name, enabled)	\
 	(1UL << __SCHED_FEAT_##name) * enabled |
 
-const_debug unsigned int sysctl_sched_features =
+unsigned int sysctl_sched_features =
 #include "features.h"
 	0;
 
@@ -308,7 +308,7 @@ late_initcall(sched_init_debug);
  * Number of tasks to iterate in a single balance run.
  * Limited because this is done with IRQs disabled.
  */
-const_debug unsigned int sysctl_sched_nr_migrate = 32;
+unsigned int sysctl_sched_nr_migrate = 32;
 
 /*
  * period over which we average the RT time consumption, measured
@@ -316,7 +316,7 @@ const_debug unsigned int sysctl_sched_nr_migrate = 32;
  *
  * default: 1s
  */
-const_debug unsigned int sysctl_sched_time_avg = MSEC_PER_SEC;
+unsigned int sysctl_sched_time_avg = MSEC_PER_SEC;
 
 /*
  * period over which we measure -rt task cpu usage in us.
@@ -337,12 +337,12 @@ int sysctl_sched_rt_runtime = 950000;
  * to itself before a sleep is injected in its next sched_yield call
  * Setting this to -1 will disable adding sleep in sched_yield
  */
-const_debug int sysctl_sched_yield_sleep_threshold = 4;
+int sysctl_sched_yield_sleep_threshold = 4;
 /*
  * Sleep duration in us used when sched_yield_sleep_threshold
  * is exceeded.
  */
-const_debug unsigned int sysctl_sched_yield_sleep_duration = 50;
+unsigned int sysctl_sched_yield_sleep_duration = 50;
 
 /*
  * __task_rq_lock - lock the rq @p resides on.
@@ -8288,7 +8288,7 @@ void __init sched_init_smp(void)
 }
 #endif /* CONFIG_SMP */
 
-const_debug unsigned int sysctl_timer_migration = 1;
+unsigned int sysctl_timer_migration = 1;
 
 int in_sched_functions(unsigned long addr)
 {

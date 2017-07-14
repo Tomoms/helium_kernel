@@ -422,7 +422,7 @@ static int __cpuinit _cpu_up(unsigned int cpu, int tasks_frozen)
 	if (ret) {
 		nr_calls--;
 		if (!core_control)
-			printk_ratelimited(KERN_WARNING
+			printk(KERN_WARNING
 				"%s: attempt to bring up CPU %u failed\n",
 				__func__, cpu);
 		goto out_notify;

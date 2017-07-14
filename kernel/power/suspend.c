@@ -370,6 +370,7 @@ static int enter_state(suspend_state_t state)
 	sys_sync();
 	printk("done.\n");
 
+#ifndef CONFIG_PM_SYNC_BEFORE_SUSPEND
 	if (suspendsync) {
 		printk(KERN_INFO "PM: Syncing filesystems ... ");
 		sys_sync();
