@@ -380,8 +380,7 @@ static int __cpuinit _cpu_up(unsigned int cpu, int tasks_frozen)
 		goto out;
 	}
 
-	ret = smpboot_prepare(cpu);
-
+	ret = smpboot_create_threads(cpu);
 	if (ret)
 		goto out;
 
@@ -394,7 +393,7 @@ static int __cpuinit _cpu_up(unsigned int cpu, int tasks_frozen)
 	}
 
 	/* Arch-specific enabling code. */
-	ret = __cpu_up(cpu, idle_thread_get(cpu));
+	ret = __cpu_up(cpu, idle);
 	if (ret != 0)
 		goto out_notify;
 	BUG_ON(!cpu_online(cpu));
