@@ -6677,7 +6677,7 @@ static void __init msm8960_clock_pre_init(void)
 		pll3_clk.c.rate = 650000000;
 		gfx3d_clk.c.fmax[VDD_DIG_LOW] = 192000000;
 		gfx3d_clk.c.fmax[VDD_DIG_NOMINAL] = 325000000;
-		gfx3d_clk.c.fmax[VDD_DIG_HIGH] = 480000000;
+		gfx3d_clk.c.fmax[VDD_DIG_HIGH] = 425000000;
 		mdp_clk.freq_tbl = clk_tbl_mdp_8960ab;
 		mdp_clk.c.fmax[VDD_DIG_LOW] = 128000000;
 		mdp_clk.c.fmax[VDD_DIG_NOMINAL] = 266667000;
