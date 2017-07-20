@@ -386,10 +386,10 @@ static int set_vdd_dig_8960(struct clk_vdd_class *vdd_class, int level)
 		[VDD_DIG_NONE]    =       0,
 		[VDD_DIG_LOW]     =  945000,
 		[VDD_DIG_NOMINAL] = 1050000,
-		[VDD_DIG_HIGH]    = 1150000
-	};
+		[VDD_DIG_HIGH]    = 1350000
+};
 	return rpm_vreg_set_voltage(RPM_VREG_ID_PM8921_S3, RPM_VREG_VOTER3,
-				    vdd_uv[level], 1150000, 1);
+				    vdd_uv[level], 1350000, 1);
 }
 
 static DEFINE_VDD_CLASS(vdd_dig, set_vdd_dig_8960, VDD_DIG_NUM);
@@ -3544,7 +3544,7 @@ static struct clk_freq_tbl clk_tbl_gfx3d[] = {
 	F_GFX3D(400000000, pll2,  1,  2),
 	F_GFX3D(450000000, pll15, 1,  2),
 #ifdef CONFIG_GPU_OVERCLOCK
-	F_GFX3D(480000000, pll2,  6,  10),
+	F_GFX3D(487500000, pll3, 6,  8),
 #endif
 	F_END
 };
@@ -3568,7 +3568,7 @@ static struct clk_freq_tbl clk_tbl_gfx3d_8960[] = {
 	F_GFX3D(320000000, pll2, 2,  5),
 	F_GFX3D(400000000, pll2, 1,  2),
 #ifdef CONFIG_GPU_OVERCLOCK
-	F_GFX3D(480000000, pll2, 6,  10),
+	F_GFX3D(487500000, pll3, 6,  8),
 #endif
 	F_END
 };
@@ -3665,7 +3665,7 @@ static struct rcg_clk gfx3d_clk = {
 		.ops = &clk_ops_rcg,
 #ifdef CONFIG_GPU_OVERCLOCK
 		VDD_DIG_FMAX_MAP3(LOW,  128000000, NOMINAL, 300000000,
-				  HIGH, 480000000),
+				  HIGH, 487500000),
 #else
 		VDD_DIG_FMAX_MAP3(LOW,  128000000, NOMINAL, 300000000,
 				  HIGH, 400000000),
@@ -6677,7 +6677,7 @@ static void __init msm8960_clock_pre_init(void)
 		pll3_clk.c.rate = 650000000;
 		gfx3d_clk.c.fmax[VDD_DIG_LOW] = 192000000;
 		gfx3d_clk.c.fmax[VDD_DIG_NOMINAL] = 325000000;
-		gfx3d_clk.c.fmax[VDD_DIG_HIGH] = 425000000;
+		gfx3d_clk.c.fmax[VDD_DIG_HIGH] = 487500000;
 		mdp_clk.freq_tbl = clk_tbl_mdp_8960ab;
 		mdp_clk.c.fmax[VDD_DIG_LOW] = 128000000;
 		mdp_clk.c.fmax[VDD_DIG_NOMINAL] = 266667000;
