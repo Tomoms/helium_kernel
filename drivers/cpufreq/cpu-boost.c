@@ -146,7 +146,6 @@ static int boost_mig_sync_thread(void *data)
 	struct cpufreq_policy dest_policy;
 	struct cpufreq_policy src_policy;
 	unsigned long flags;
-	unsigned int req_freq;
 
 	while (1) {
 		wait_event_interruptible(s->sync_wq, s->pending ||
