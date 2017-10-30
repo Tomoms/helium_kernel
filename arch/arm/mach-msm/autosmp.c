@@ -85,7 +85,7 @@ static struct asmp_param_struct {
 
 static u64 last_boost_time;
 static unsigned int cycle = 0;
-static int autosmp_enabled __read_mostly = 0;
+static int autosmp_enabled __read_mostly = 1;
 static int enable_switch = 0;
 /*
  * suspend mode, if set = 1 hotplug will sleep,
@@ -468,8 +468,8 @@ static struct kernel_param_ops module_ops = {
 	.get = param_get_bool,
 };
 
-module_param_cb(autosmp_enabled, &module_ops, &autosmp_enabled, 0644);
-MODULE_PARM_DESC(autosmp_enabled, "hotplug/unplug cpu cores based on cpu load");
+module_param_cb(enabled, &module_ops, &autosmp_enabled, 0644);
+MODULE_PARM_DESC(enabled, "hotplug/unplug cpu cores based on cpu load");
 
 /***************************** SYSFS START *****************************/
 #define define_one_global_ro(_name)					\
