@@ -401,7 +401,7 @@ obj-$(CONFIG_ARCH_RANDOM) += early_random.o
 
 obj-$(CONFIG_HAS_MACH_MEMUTILS) += memutils/
 
-obj-$(CONFIG_ASMP) 		+= autosmp.o
+obj-$(CONFIG_ASMP) 		+= bricked_hotplug.o
 
 obj-$(CONFIG_RAMDUMP_TAGS) += board-rdtags.o
 CFLAGS_board-rdtags.o	:= \
