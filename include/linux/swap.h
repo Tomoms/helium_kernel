@@ -350,7 +350,7 @@ extern atomic_long_t nr_swap_pages;
 extern long total_swap_pages;
 extern bool is_swap_fast(swp_entry_t entry);
 
-/* Swap 50% full? Release swapcache more aggressively.. */
+/* Swap 50% full? */
 static inline bool vm_swap_full(struct swap_info_struct *si)
 {
 	/*
