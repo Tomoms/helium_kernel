@@ -39,7 +39,7 @@
 #define ASMP_STARTDELAY		1000
 #define DEFAULT_BOOST_LOCK_DUR	500 * 1000L
 #define DEFAULT_NR_CPUS_BOOSTED	1
-#define DEFAULT_UPDATE_RATE	30
+#define DEFAULT_UPDATE_RATE	80
 #define MIN_INPUT_INTERVAL	150 * 1000L
 #define DEFAULT_MIN_BOOST_FREQ	1458000
 
@@ -74,8 +74,8 @@ static struct asmp_param_struct {
 	.suspended = 0,
 	.max_cpus = CONFIG_NR_CPUS,
 	.min_cpus = 1,
-	.cpufreq_up = 95,
-	.cpufreq_down = 80,
+	.cpufreq_up = 90,
+	.cpufreq_down = 75,
 	.cycle_up = 1,
 	.cycle_down = 1,
 	.min_boost_freq = DEFAULT_MIN_BOOST_FREQ,
@@ -85,7 +85,7 @@ static struct asmp_param_struct {
 
 static u64 last_boost_time;
 static unsigned int cycle = 0;
-static int autosmp_enabled __read_mostly = 1;
+static int enabled __read_mostly = 0;
 static int enable_switch = 0;
 /*
  * suspend mode, if set = 1 hotplug will sleep,
@@ -109,7 +109,7 @@ static void __cpuinit asmp_work_fn(struct work_struct *work)
 	unsigned int min_boost_freq = asmp_param.min_boost_freq;
 	u64 now;
 	
-	if (!autosmp_enabled)
+	if (!enabled)
 		return;
 
 	cycle++;
@@ -245,7 +245,7 @@ static void __ref asmp_resume(void)
 static int state_notifier_callback(struct notifier_block *this,
 				unsigned long event, void *data)
 {
-	if (!autosmp_enabled)
+	if (!enabled)
                 return NOTIFY_OK;
 
 	switch (event) {
@@ -302,7 +302,7 @@ static void autosmp_input_event(struct input_handle *handle, unsigned int type,
 
 	if (asmp_param.suspended)
 		return;
-	if (!autosmp_enabled)
+	if (!enabled)
 		return;
 
 	now = ktime_to_us(ktime_get());
@@ -393,7 +393,7 @@ static int hotplug_start(void)
 	if (!asmp_workq) {
 		pr_err("%s: Failed to allocate hotplug workqueue\n",
 					ASMP_TAG);
-		autosmp_enabled = 0;
+		enabled = 0;
 		ret = -ENOMEM;
 		goto quit;
 	}
@@ -439,7 +439,7 @@ static int __cpuinit set_enabled(const char *val, const struct kernel_param *kp)
 	unsigned int cpu;
 
 	ret = param_set_bool(val, kp);
-	if (autosmp_enabled) {
+	if (enabled) {
 		if (!enable_switch) {
 			enable_switch = 1;
 			hotplug_start();
@@ -468,7 +468,7 @@ static struct kernel_param_ops module_ops = {
 	.get = param_get_bool,
 };
 
-module_param_cb(enabled, &module_ops, &autosmp_enabled, 0644);
+module_param_cb(enabled, &module_ops, &enabled, 0644);
 MODULE_PARM_DESC(enabled, "hotplug/unplug cpu cores based on cpu load");
 
 /***************************** SYSFS START *****************************/
@@ -649,7 +649,7 @@ static int __init asmp_init(void)
 	for_each_possible_cpu(cpu)
 		per_cpu(asmp_cpudata, cpu).times_hotplugged = 0;
 
-	if (autosmp_enabled) {
+	if (enabled) {
 		asmp_workq =
 			alloc_workqueue("autosmp_wq", WQ_HIGHPRI | WQ_FREEZABLE, 0);
 		if (!asmp_workq) {
@@ -700,7 +700,7 @@ static int __init asmp_init(void)
 err_dev:
 	destroy_workqueue(asmp_workq);
 err_out:
-	autosmp_enabled = 0;
+	enabled = 0;
 	return ret;
 }
 late_initcall(asmp_init);
