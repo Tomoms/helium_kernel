@@ -8,8 +8,8 @@
  *
  * Maple uses a first come first serve style algorithm with seperated read/write
  * handling to allow for read biases. By prioritizing reads, simple tasks should improve
- * in performance. Maple also uses hooks for the state_notifier driver to increase
- * expirations when the devices is suspended to decrease workload.
+ * in performance. Maple also uses hooks for the powersuspend driver to increase
+ * expirations when power is suspended to decrease workload.
  */
 #include <linux/blkdev.h>
 #include <linux/elevator.h>
@@ -17,25 +17,20 @@
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/slab.h>
-#ifdef CONFIG_STATE_NOTIFIER
 #include <linux/state_notifier.h>
-#endif
 
-#define MAPLE_IOSCHED_PATCHLEVEL	(5)
+#define MAPLE_IOSCHED_PATCHLEVEL	(7)
 
 enum { ASYNC, SYNC };
 
 /* Tunables */
-static const int sync_read_expire = HZ / 4;	/* max time before a read sync is submitted. */
-static const int sync_write_expire = HZ / 4 * 5;	/* max time before a write sync is submitted. */
-static const int async_read_expire = HZ / 2;	/* ditto for read async, these limits are SOFT! */
-static const int async_write_expire = HZ * 2;	/* ditto for write async, these limits are SOFT! */
-static const int fifo_batch = 4;		/* # of sequential requests treated as one by the above parameters. */
-static const int writes_starved = 3;		/* max times reads can starve a write */
-static const int sleep_latency_multiple = 5;	/* multple for expire time when device is asleep */
-
-static struct notifier_block notif;
-static bool suspended = 0;
+static const int sync_read_expire = 100;	/* max time before a read sync is submitted. */
+static const int sync_write_expire = 350;	/* max time before a write sync is submitted. */
+static const int async_read_expire = 200;	/* ditto for read async, these limits are SOFT! */
+static const int async_write_expire = 500;	/* ditto for write async, these limits are SOFT! */
+static const int fifo_batch = 8;		/* # of sequential requests treated as one by the above parameters. */
+static const int writes_starved = 4;		/* max times reads can starve a write */
+static const int sleep_latency_multiple = 10; /* multple for expire time when device is asleep */
 
 /* Elevator data */
 struct maple_data {
@@ -52,25 +47,6 @@ struct maple_data {
 	int writes_starved;
   int sleep_latency_multiple;
 };
-
-#ifdef CONFIG_STATE_NOTIFIER
-static int state_notifier_callback(struct notifier_block *this,
-				unsigned long event, void *data)
-{
-	switch (event) {
-		case STATE_NOTIFIER_ACTIVE:
-			suspended = !suspended;
-			break;
-		case STATE_NOTIFIER_SUSPEND:
-			suspended = !suspended;
-			break;
-		default:
-			break;
-	}
-
-	return NOTIFY_OK;
-}
-#endif
 
 static inline struct maple_data *
 maple_get_data(struct request_queue *q) {
@@ -102,27 +78,22 @@ maple_add_request(struct request_queue *q, struct request *rq)
 	struct maple_data *mdata = maple_get_data(q);
 	const int sync = rq_is_sync(rq);
 	const int dir = rq_data_dir(rq);
+	const bool display_on = state_suspended;
 
 	/*
 	 * Add request to the proper fifo list and set its
 	 * expire time.
 	 */
-#ifdef STATE_NOTIFIER
+
    	/* inrease expiration when device is asleep */
    	unsigned int fifo_expire_suspended = mdata->fifo_expire[sync][dir] * sleep_latency_multiple;
-   	if (!suspended && mdata->fifo_expire[sync][dir]) {
+   	if (display_on && mdata->fifo_expire[sync][dir]) {
    		rq_set_fifo_time(rq, jiffies + mdata->fifo_expire[sync][dir]);
    		list_add_tail(&rq->queuelist, &mdata->fifo_list[sync][dir]);
-   	} else if (suspended && fifo_expire_suspended) {
+   	} else if (!display_on && fifo_expire_suspended) {
    		rq_set_fifo_time(rq, jiffies + fifo_expire_suspended);
    		list_add_tail(&rq->queuelist, &mdata->fifo_list[sync][dir]);
    	}
-#else
-   	if (mdata->fifo_expire[sync][dir]) {
-   		rq_set_fifo_time(rq, jiffies + mdata->fifo_expire[sync][dir]);
-   		list_add_tail(&rq->queuelist, &mdata->fifo_list[sync][dir]);
-   	}
-#endif
 }
 
 static struct request *
@@ -234,6 +205,7 @@ maple_dispatch_requests(struct request_queue *q, int force)
 	struct maple_data *mdata = maple_get_data(q);
 	struct request *rq = NULL;
 	int data_dir = READ;
+	const bool display_on = state_suspended;
 
 	/*
 	 * Retrieve any expired request after a batch of
@@ -244,16 +216,11 @@ maple_dispatch_requests(struct request_queue *q, int force)
 
 	/* Retrieve request */
 	if (!rq) {
-#ifdef CONFIG_STATE_NOTIFIER
 		/* Treat writes fairly while suspended, otherwise allow them to be starved */
-		if (!suspended && mdata->starved >= mdata->writes_starved)
+		if (display_on && mdata->starved >= mdata->writes_starved)
 			data_dir = WRITE;
-		else if (suspended && mdata->starved >= 1)
+		else if (!display_on && mdata->starved >= 1)
 			data_dir = WRITE;
-#else
-		if (mdata->starved >= mdata->writes_starved)
-			data_dir = WRITE;
-#endif
 
 		rq = maple_choose_request(mdata, data_dir);
 		if (!rq)
@@ -426,23 +393,12 @@ static struct elevator_type iosched_maple = {
 
 static int __init maple_init(void)
 {
-#ifdef CONFIG_STATE_NOTIFIER
-	notif.notifier_call = state_notifier_callback;
-	if (state_register_client(&notif)) {
-		pr_err("maple-iosched: Failed to register state notifier callback\n");
-		return 1;
-	}
-#endif
-
+	/* Register elevator */
 	return elv_register(&iosched_maple);
 }
 
 static void __exit maple_exit(void)
 {
-#ifdef CONFIG_STATE_NOTIFIER
-	state_unregister_client(&notif);
-#endif
-
 	/* Unregister elevator */
 	elv_unregister(&iosched_maple);
 }
