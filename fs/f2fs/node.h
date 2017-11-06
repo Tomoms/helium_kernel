@@ -15,18 +15,21 @@
 #define	NAT_BLOCK_OFFSET(start_nid) (start_nid / NAT_ENTRY_PER_BLOCK)
 
 /* # of pages to perform synchronous readahead before building free nids */
-#define FREE_NID_PAGES 4
+#define FREE_NID_PAGES	8
+#define MAX_FREE_NIDS	(NAT_ENTRY_PER_BLOCK * FREE_NID_PAGES)
 
-#define DEF_RA_NID_PAGES	4	/* # of nid pages to be readaheaded */
+#define DEF_RA_NID_PAGES	0	/* # of nid pages to be readaheaded */
 
 /* maximum readahead size for node during getting data blocks */
 #define MAX_RA_NODE		128
 
 /* control the memory footprint threshold (10MB per 1GB ram) */
-#define DEF_RAM_THRESHOLD	10
+#define DEF_RAM_THRESHOLD	1
 
 /* control dirty nats ratio threshold (default: 10% over max nid count) */
 #define DEF_DIRTY_NAT_RATIO_THRESHOLD		10
+/* control total # of nats */
+#define DEF_NAT_CACHE_THRESHOLD			100000
 
 /* vector size for gang look-up from nat cache that consists of radix tree */
 #define NATVEC_SIZE	64
@@ -126,6 +129,11 @@ static inline bool excess_dirty_nats(struct f2fs_sb_info *sbi)
 					NM_I(sbi)->dirty_nats_ratio / 100;
 }
 
+static inline bool excess_cached_nats(struct f2fs_sb_info *sbi)
+{
+	return NM_I(sbi)->nat_cnt >= DEF_NAT_CACHE_THRESHOLD;
+}
+
 enum mem_type {
 	FREE_NIDS,	/* indicates the free nid list */
 	NAT_ENTRIES,	/* indicates the cached nat entry */
@@ -161,14 +169,15 @@ static inline void next_free_nid(struct f2fs_sb_info *sbi, nid_t *nid)
 	struct f2fs_nm_info *nm_i = NM_I(sbi);
 	struct free_nid *fnid;
 
-	spin_lock(&nm_i->free_nid_list_lock);
-	if (nm_i->fcnt <= 0) {
-		spin_unlock(&nm_i->free_nid_list_lock);
+	spin_lock(&nm_i->nid_list_lock);
+	if (nm_i->nid_cnt[FREE_NID_LIST] <= 0) {
+		spin_unlock(&nm_i->nid_list_lock);
 		return;
 	}
-	fnid = list_entry(nm_i->free_nid_list.next, struct free_nid, list);
+	fnid = list_entry(nm_i->nid_list[FREE_NID_LIST].next,
+						struct free_nid, list);
 	*nid = fnid->nid;
-	spin_unlock(&nm_i->free_nid_list_lock);
+	spin_unlock(&nm_i->nid_list_lock);
 }
 
 /*
