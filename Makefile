@@ -378,9 +378,8 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -mtune=cortex-a15 \
 		   -mfpu=neon-vfpv4 \
 		   -ftree-vectorize \
-		   -mvectorize-with-neon-double \
+		   -mvectorize-with-neon-double
 #		   -ftree-parallelize-loops=4 \
-		   -ffast-math
 
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
