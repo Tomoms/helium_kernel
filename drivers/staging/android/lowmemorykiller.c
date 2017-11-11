@@ -519,7 +519,6 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 				"   Total Slab is %ldkB\n" \
 				"   Total zcache is %ldkB\n" \
 				"   GFP mask is 0x%x\n",
-				"   GFP mask is 0x%x\n",
 			     selected->comm, selected->pid,
 			     selected_oom_score_adj,
 			     selected_tasksize * (long)(PAGE_SIZE / 1024),
