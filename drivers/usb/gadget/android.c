@@ -87,7 +87,6 @@
 #include "f_hid.h"
 #include "f_hid_android_keyboard.c"
 #include "f_hid_android_mouse.c"
-#include "u_ether.c"
 #include "u_bam_data.c"
 #include "f_mbim.c"
 #include "f_qc_ecm.c"
