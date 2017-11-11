@@ -580,7 +580,7 @@ static int __init cpu_ib_init(void)
 
 	b->ib.freq[0] = 810000;
 	b->ib.freq[1] = 1458000;
-	b->ib.duration_ms = 1200;
+	b->ib.duration_ms = 100;
 	b->enabled = 1;
 
 	INIT_WORK(&b->fb.boost_work, fb_boost_main);
