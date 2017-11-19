@@ -1671,6 +1671,37 @@ struct page *ksm_does_need_to_copy(struct page *page,
 	return new_page;
 }
 
+struct page *ksm_might_need_to_copy(struct page *page,
+			struct vm_area_struct *vma, unsigned long address)
+{
+	struct anon_vma *anon_vma = page_anon_vma(page);
+	struct page *new_page;
+
+	if (PageKsm(page)) {
+		if (page_stable_node(page) &&
+		    !(ksm_run & KSM_RUN_UNMERGE))
+			return page;	/* no need to copy it */
+	} else if (!anon_vma) {
+		return page;		/* no need to copy it */
+	} else if (anon_vma->root == vma->anon_vma->root &&
+		 page->index == linear_page_index(vma, address)) {
+		return page;		/* still no need to copy it */
+	}
+	if (!PageUptodate(page))
+		return page;		/* let do_swap_page report the error */
+
+	new_page = alloc_page_vma(GFP_HIGHUSER_MOVABLE, vma, address);
+	if (new_page) {
+		copy_user_highpage(new_page, page, address, vma);
+
+		SetPageDirty(new_page);
+		__SetPageUptodate(new_page);
+		__set_page_locked(new_page);
+	}
+
+	return new_page;
+}
+
 int page_referenced_ksm(struct page *page, struct mem_cgroup *memcg,
 			unsigned long *vm_flags)
 {
