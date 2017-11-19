@@ -221,16 +221,14 @@ PAGEFLAG(Reserved, reserved) __CLEARPAGEFLAG(Reserved, reserved)
 PAGEFLAG(SwapBacked, swapbacked) __CLEARPAGEFLAG(SwapBacked, swapbacked)
 
 __PAGEFLAG(SlobFree, slob_free)
-<<<<<<< HEAD
 #ifdef CONFIG_ZCACHE
 PAGEFLAG(WasActive, was_active)
 #else
 PAGEFLAG_FALSE(WasActive)
-=======
+#endif
 #ifdef CONFIG_KSM_CHECK_PAGE
 CLEARPAGEFLAG(KsmScan0, ksm_scan0) TESTSETFLAG(KsmScan0, ksm_scan0)
 CLEARPAGEFLAG(KsmScan1, ksm_scan1) TESTSETFLAG(KsmScan1, ksm_scan1)
->>>>>>> 71d4aab16530... ksm: check and skip page, if it is already scanned
 #endif
 
 /*
