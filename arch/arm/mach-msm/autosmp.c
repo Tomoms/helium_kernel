@@ -302,8 +302,6 @@ static void autosmp_input_event(struct input_handle *handle, unsigned int type,
 
 	if (asmp_param.suspended)
 		return;
-	if (!enabled)
-		return;
 
 	now = ktime_to_us(ktime_get());
 	asmp_param.last_input = now;
