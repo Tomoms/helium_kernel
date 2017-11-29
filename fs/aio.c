@@ -984,7 +984,7 @@ int aio_complete(struct kiocb *iocb, long res, long res2)
 	struct io_event	*event;
 	unsigned long	flags;
 	unsigned long	tail;
-	int		ret;
+	int ret = 0;
 
 	/*
 	 * Special case handling for sync iocbs:
