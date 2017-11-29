@@ -1800,7 +1800,6 @@ static ssize_t f2fs_direct_IO(int rw, struct kiocb *iocb,
 		return 0;
 	if (rw == WRITE && test_opt(F2FS_I_SB(inode), LFS))
 		return 0;
-#endif
 
 	trace_f2fs_direct_IO_enter(inode, offset, count, rw);
 

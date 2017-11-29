@@ -3003,7 +3003,6 @@ static void __init futex_detect_cmpxchg(void)
 #ifndef CONFIG_HAVE_FUTEX_CMPXCHG
 	u32 curval;
 	unsigned int futex_shift;
-	unsigned long i;
 
 #if CONFIG_BASE_SMALL
 	futex_hashsize = 16;
