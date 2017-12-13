@@ -34,8 +34,6 @@ typedef uint32_t key_perm_t;
 
 struct key;
 
-#define key_replace_session_keyring()	do { } while (0)
-
 #ifdef CONFIG_KEYS
 
 #undef KEY_DEBUGGING
@@ -310,6 +308,9 @@ static inline bool key_is_instantiated(const struct key *key)
 #ifdef CONFIG_SYSCTL
 extern ctl_table key_sysctls[];
 #endif
+
+extern void key_replace_session_keyring(void);
+
 /*
  * the userspace interface
  */
@@ -333,6 +334,7 @@ extern void key_init(void);
 #define key_fsuid_changed(t)		do { } while(0)
 #define key_fsgid_changed(t)		do { } while(0)
 #define key_init()			do { } while(0)
+#define key_replace_session_keyring()	do { } while(0)
 
 #endif /* CONFIG_KEYS */
 #endif /* __KERNEL__ */
