@@ -1434,22 +1434,6 @@ bool queue_work_on(int cpu, struct workqueue_struct *wq,
 }
 EXPORT_SYMBOL(queue_work_on);
 
-/**
- * queue_work - queue work on a workqueue
- * @wq: workqueue to use
- * @work: work to queue
- *
- * Returns %false if @work was already on a queue, %true otherwise.
- *
- * We queue the work to the CPU on which it was submitted, but if the CPU dies
- * it can be processed by another CPU.
- */
-bool queue_work(struct workqueue_struct *wq, struct work_struct *work)
-{
-	return queue_work_on(WORK_CPU_UNBOUND, wq, work);
-}
-EXPORT_SYMBOL_GPL(queue_work);
-
 void delayed_work_timer_fn(unsigned long __data)
 {
 	struct delayed_work *dwork = (struct delayed_work *)__data;
@@ -1480,8 +1464,6 @@ static void __queue_delayed_work(int cpu, struct workqueue_struct *wq,
 		__queue_work(cpu, wq, &dwork->work);
 		return;
 	}
-
-	timer_stats_timer_set_start_info(&dwork->timer);
 
 	dwork->wq = wq;
 	dwork->cpu = cpu;
