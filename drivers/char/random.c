@@ -305,7 +305,7 @@
 #ifdef CONFIG_CRYPTO_FIPS
 static int random_read_wakeup_bits = 256;
 #else
-static int random_read_wakeup_bits = 64;
+static int random_read_wakeup_bits = 256;
 #endif
 
 /*
@@ -316,7 +316,7 @@ static int random_read_wakeup_bits = 64;
 #ifdef CONFIG_CRYPTO_FIPS
 static int random_write_wakeup_bits = 40 * OUTPUT_POOL_WORDS;
 #else
-static int random_write_wakeup_bits = 28 * OUTPUT_POOL_WORDS;
+static int random_write_wakeup_bits = 320;
 #endif
 /*
  * The minimum number of seconds between urandom pool reseeding.  We
@@ -669,10 +669,7 @@ retry:
 		r->entropy_total = 0;
 		if (r == &nonblocking_pool) {
 			prandom_reseed_late();
-<<<<<<< HEAD
-=======
-			wake_up_interruptible(&urandom_init_wait);
->>>>>>> c7e841d7b3b5... Backport the random driver from Linux 4.1 (longterm)
+//			wake_up_interruptible(&urandom_init_wait);
 			pr_notice("random: %s pool is initialized\n", r->name);
 		}
 	}
