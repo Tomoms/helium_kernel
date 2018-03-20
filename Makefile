@@ -245,8 +245,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc-7
 HOSTCXX      = g++-7
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 -fomit-frame-pointer -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block -floop-nest-optimize
-HOSTCXXFLAGS = -O3 -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block -floop-nest-optimize
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 -fomit-frame-pointer -pipe
+HOSTCXXFLAGS = -O3 -pipe
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -349,11 +349,20 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
+GRAPHITE	= -fgraphite -fgraphite-identity -floop-flatten -floop-parallelize-all \
+		  -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block \
+		  -floop-nest-optimize
+GENERAL_OPT	= -mvectorize-with-neon-double -fno-store-merging \
+		  -fivopts -fsched-pressure -fira-loop-pressure -funroll-loops \
+		  -fforce-addr -fsched-spec-load -ftree-loop-distribution \
+		  -ftree-loop-ivcanon -ftree-loop-im -ftree-vectorize
+MACHINE_OPT	= -mcpu=cortex-a15 -mfloat-abi=softfp -marm -mfpu=neon-vfpv4 
+#errore: -fmodulo-sched -fmodulo-sched-allow-regmoves
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL	= -munaligned-access -fforce-addr -fgraphite -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block -floop-flatten -floop-nest-optimize
-AFLAGS_KERNEL	=
+CFLAGS_KERNEL	= -munaligned-access $(GRAPHITE) $(GENERAL_OPT) $(MACHINE_OPT)
+AFLAGS_KERNEL	= -munaligned-access $(MACHINE_OPT)
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 
@@ -373,12 +382,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-delete-null-pointer-checks \
 		   -Wno-maybe-uninitialized \
 		   -Wno-logical-not-parentheses \
-		   -mtune=cortex-a15 \
-		   -mfloat-abi=softfp \
-		   -mfpu=neon-vfpv4 \
-		   -mvectorize-with-neon-double \
-#		   -ftree-parallelize-loops=4 \
-		   -fgraphite -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block -floop-flatten -floop-nest-optimize -fforce-addr -fsched-spec-load -fgcse-las -fgcse-lm -fgcse-sm -Wno-misleading-indentation -fweb -frename-registers -fira-loop-pressure -fsched-pressure -ftree-loop-distribution -ftree-loop-ivcanon -ftree-loop-im
+		   $(MACHINE_OPT)
 
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
@@ -572,7 +576,7 @@ all: vmlinux
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS	+= -Os
 else
-KBUILD_CFLAGS	+= -O3 -g0 -fmodulo-sched -fmodulo-sched-allow-regmoves -fno-tree-vectorize -Wno-array-bounds -fivopts -finline-functions  $(call cc-disable-warning,maybe-uninitialized,)
+KBUILD_CFLAGS	+= -O3 -g0 -DNDEBUG
 endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
