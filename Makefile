@@ -245,8 +245,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc-7
 HOSTCXX      = g++-7
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 -fomit-frame-pointer -pipe
-HOSTCXXFLAGS = -O3 -pipe
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -pipe -fno-tree-vectorize
+HOSTCXXFLAGS = -O2 -pipe -fno-tree-vectorize
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -349,20 +349,22 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-GRAPHITE	= -fgraphite -fgraphite-identity -floop-flatten -floop-parallelize-all \
+GRAPHITE	= -fgraphite -floop-flatten -floop-parallelize-all \
 		  -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block \
 		  -floop-nest-optimize
-GENERAL_OPT	= -mvectorize-with-neon-double -fno-store-merging \
+GENERAL_OPT	= -mvectorize-with-neon-double \
 		  -fivopts -fsched-pressure -fira-loop-pressure -funroll-loops \
 		  -fforce-addr -fsched-spec-load -ftree-loop-distribution \
-		  -ftree-loop-ivcanon -ftree-loop-im -ftree-vectorize
-MACHINE_OPT	= -mcpu=cortex-a15 -mfloat-abi=softfp -marm -mfpu=neon-vfpv4 
+		  -ftree-loop-ivcanon -ftree-loop-im -fopenmp
+MACHINE_OPT	= -mcpu=cortex-a15 -mfloat-abi=softfp -mfpu=neon-vfpv4 \
+		  -munaligned-access
+WORKING		= -mvectorize-with-neon-double -fopenmp -fivopts -funroll-loops -fsched-pressure -fira-loop-pressure -munaligned-access
 #errore: -fmodulo-sched -fmodulo-sched-allow-regmoves
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL	= -munaligned-access $(GRAPHITE) $(GENERAL_OPT) $(MACHINE_OPT)
-AFLAGS_KERNEL	= -munaligned-access $(MACHINE_OPT)
+CFLAGS_KERNEL	= $(GRAPHITE) $(WORKING) #$(GENERAL_OPT) $(MACHINE_OPT)
+AFLAGS_KERNEL	= -munaligned-access #$(MACHINE_OPT)
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 
@@ -382,7 +384,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-delete-null-pointer-checks \
 		   -Wno-maybe-uninitialized \
 		   -Wno-logical-not-parentheses \
-		   $(MACHINE_OPT)
+		   $(WORKING)
 
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
@@ -576,7 +578,7 @@ all: vmlinux
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS	+= -Os
 else
-KBUILD_CFLAGS	+= -O3 -g0 -DNDEBUG
+KBUILD_CFLAGS	+= -O2 -g0 -DNDEBUG
 endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
@@ -584,6 +586,8 @@ include $(srctree)/arch/$(SRCARCH)/Makefile
 ifneq ($(CONFIG_FRAME_WARN),0)
 KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
 endif
+
+KBUILD_CFLAGS   += $(call cc-option,-fno-store-merging,)
 
 # Force gcc to behave correct even for buggy distributions
 ifndef CONFIG_CC_STACKPROTECTOR
