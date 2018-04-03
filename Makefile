@@ -355,7 +355,7 @@ GRAPHITE	= -fgraphite -floop-flatten -floop-parallelize-all \
 GENERAL_OPT	=  -fforce-addr -fsched-spec-load
 MACHINE_OPT	= -mcpu=cortex-a15 -mfloat-abi=softfp -mfpu=neon-vfpv4 \
 		  -munaligned-access
-WORKING		= -mvectorize-with-neon-double -fopenmp -fivopts -funroll-loops -fsched-pressure -fira-loop-pressure -munaligned-access -ftree-loop-distribution -ftree-loop-ivcanon -ftree-loop-im -fweb -frename-registers
+WORKING		= -mvectorize-with-neon-double -fopenmp -fivopts -funroll-loops -fsched-pressure -fira-loop-pressure -munaligned-access -ftree-loop-distribution -ftree-loop-ivcanon -ftree-loop-im -fweb -frename-registers -fforce-addr -fsched-spec-load
 #errore: -fmodulo-sched -fmodulo-sched-allow-regmoves
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
