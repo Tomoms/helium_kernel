@@ -352,13 +352,10 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 GRAPHITE	= -fgraphite -floop-flatten -floop-parallelize-all \
 		  -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block \
 		  -floop-nest-optimize
-GENERAL_OPT	= -mvectorize-with-neon-double \
-		  -fivopts -fsched-pressure -fira-loop-pressure -funroll-loops \
-		  -fforce-addr -fsched-spec-load -ftree-loop-distribution \
-		  -ftree-loop-ivcanon -ftree-loop-im -fopenmp
+GENERAL_OPT	=  -fforce-addr -fsched-spec-load
 MACHINE_OPT	= -mcpu=cortex-a15 -mfloat-abi=softfp -mfpu=neon-vfpv4 \
 		  -munaligned-access
-WORKING		= -mvectorize-with-neon-double -fopenmp -fivopts -funroll-loops -fsched-pressure -fira-loop-pressure -munaligned-access
+WORKING		= -mvectorize-with-neon-double -fopenmp -fivopts -funroll-loops -fsched-pressure -fira-loop-pressure -munaligned-access -ftree-loop-distribution -ftree-loop-ivcanon -ftree-loop-im -fweb -frename-registers
 #errore: -fmodulo-sched -fmodulo-sched-allow-regmoves
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
@@ -384,7 +381,8 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-delete-null-pointer-checks \
 		   -Wno-maybe-uninitialized \
 		   -Wno-logical-not-parentheses \
-		   $(WORKING)
+		   $(WORKING) \
+		   $(GRAPHITE)
 
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
