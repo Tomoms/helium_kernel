@@ -81,7 +81,7 @@ static struct cpu_hotplug {
 	.max_cpus_online = DEFAULT_MAX_CPUS_ONLINE,
 	.min_cpus_online = DEFAULT_MIN_CPUS_ONLINE,
 	.bricked_enabled = HOTPLUG_ENABLED,
-	.hotplug_suspend = 0,
+	.hotplug_suspend = 1,
 };
 
 static unsigned int NwNs_Threshold[8] = {12, 0, 25, 7, 30, 10, 0, 18};
@@ -252,10 +252,7 @@ static void bricked_hotplug_suspend(void)
 {
 	int cpu;
 
-	if (hotplug.suspended)
-		return;
-
-	if (!hotplug.hotplug_suspend)
+	if (hotplug.suspended || !hotplug.hotplug_suspend)
 		return;
 
 	mutex_lock(&hotplug.bricked_hotplug_mutex);
