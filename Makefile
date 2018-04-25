@@ -352,16 +352,15 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 GRAPHITE	= -fgraphite -floop-flatten -floop-parallelize-all \
 		  -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block \
 		  -floop-nest-optimize
-GENERAL_OPT	=  -fforce-addr -fsched-spec-load
-MACHINE_OPT	= -mcpu=cortex-a15 -mfloat-abi=softfp -mfpu=neon-vfpv4 \
+MACHINE_OPT	= -mcpu=cortex-a15 -mfpu=neon-vfpv4 \
 		  -munaligned-access
-WORKING		= -mvectorize-with-neon-double -fopenmp -fivopts -funroll-loops -fsched-pressure -fira-loop-pressure -munaligned-access -ftree-loop-distribution -ftree-loop-ivcanon -ftree-loop-im -fweb -frename-registers -fforce-addr -fsched-spec-load
-#errore: -fmodulo-sched -fmodulo-sched-allow-regmoves
+WORKING		= -mvectorize-with-neon-double -fopenmp -fivopts -fsched-pressure -fira-loop-pressure -munaligned-access -ftree-loop-distribution -ftree-loop-ivcanon -ftree-loop-im -fweb -frename-registers -fforce-addr -fgcse-las -fgcse-lm -fgcse-sm -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fsched-spec-load -fsched-spec-load-dangerous -ftree-partial-pre -ftree-vectorize
+#error: -fmodulo-sched -fmodulo-sched-allow-regmoves
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL	= $(GRAPHITE) $(WORKING) #$(GENERAL_OPT) $(MACHINE_OPT)
-AFLAGS_KERNEL	= -munaligned-access #$(MACHINE_OPT)
+CFLAGS_KERNEL	=
+AFLAGS_KERNEL	= -munaligned-access
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 
@@ -584,8 +583,6 @@ include $(srctree)/arch/$(SRCARCH)/Makefile
 ifneq ($(CONFIG_FRAME_WARN),0)
 KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
 endif
-
-KBUILD_CFLAGS   += $(call cc-option,-fno-store-merging,)
 
 # Force gcc to behave correct even for buggy distributions
 ifndef CONFIG_CC_STACKPROTECTOR
