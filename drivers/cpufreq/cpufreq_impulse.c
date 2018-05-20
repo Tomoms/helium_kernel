@@ -65,11 +65,11 @@ static cpumask_t speedchange_cpumask;
 static spinlock_t speedchange_cpumask_lock;
 static struct mutex gov_lock;
 
-/* Target load.  Lower values result in higher CPU speeds. */
+/* Target load. Lower values result in higher CPU speeds. */
 #define DEFAULT_TARGET_LOAD 90
 static unsigned int default_target_loads[] = {DEFAULT_TARGET_LOAD};
 
-#define DEFAULT_TIMER_RATE (20 * USEC_PER_MSEC)
+#define DEFAULT_TIMER_RATE (30 * USEC_PER_MSEC)
 #define DEFAULT_TIMER_RATE_SUSP ((unsigned long)(50 * USEC_PER_MSEC))
 #define DEFAULT_ABOVE_HISPEED_DELAY DEFAULT_TIMER_RATE
 static unsigned int default_above_hispeed_delay[] = {
@@ -78,9 +78,9 @@ static unsigned int default_above_hispeed_delay[] = {
 struct cpufreq_impulse_tunables {
 	int usage_count;
 	/* Hi speed to bump to from lo speed when load burst (default max) */
-	unsigned int hispeed_freq;
+	unsigned int hispeed_freq = 1134000;
 	/* Go to hi speed when CPU load at or above this value. */
-#define DEFAULT_GO_HISPEED_LOAD 99
+#define DEFAULT_GO_HISPEED_LOAD 65
 	unsigned long go_hispeed_load;
 
 	/* Target load. Lower values result in higher CPU speeds. */
@@ -114,7 +114,7 @@ struct cpufreq_impulse_tunables {
 	 */
 #define DEFAULT_TIMER_SLACK (4 * DEFAULT_TIMER_RATE)
 	int timer_slack_val;
-	bool io_is_busy;
+	bool io_is_busy = 1;
 
 	/*
 	 * Whether to align timer windows across all CPUs.
@@ -128,7 +128,7 @@ struct cpufreq_impulse_tunables {
 	unsigned int max_freq_hysteresis;
 
 	/* Improves frequency selection for more energy */
-	bool powersave_bias;
+	bool powersave_bias = 1;
 };
 
 /* For cases where we have single governor instance for system */
