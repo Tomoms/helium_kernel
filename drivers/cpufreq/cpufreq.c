@@ -1167,8 +1167,6 @@ static int __cpufreq_add_dev(struct device *dev, struct subsys_interface *sif,
 				CPUFREQ_CREATE_POLICY, policy);
 	}
 
-	blocking_notifier_call_chain(&cpufreq_policy_notifier_list,
-			CPUFREQ_CREATE_POLICY, policy);
 	write_lock_irqsave(&cpufreq_driver_lock, flags);
 	list_add(&policy->policy_list, &cpufreq_policy_list);
 	write_unlock_irqrestore(&cpufreq_driver_lock, flags);
@@ -1202,8 +1200,6 @@ err_get_freq:
 	if (cpufreq_driver->exit)
 		cpufreq_driver->exit(policy);
 err_set_policy_cpu:
-	blocking_notifier_call_chain(&cpufreq_policy_notifier_list,
-			CPUFREQ_REMOVE_POLICY, policy);
 	if (frozen) {
 		/* Do not leave stale fallback data behind. */
 		per_cpu(cpufreq_cpu_data_fallback, cpu) = NULL;
@@ -1313,8 +1309,6 @@ static int __cpufreq_remove_dev_prepare(struct device *dev,
 		new_cpu = cpufreq_nominate_new_policy_cpu(policy, cpu);
 		if (new_cpu >= 0) {
 			update_policy_cpu(policy, new_cpu);
-			blocking_notifier_call_chain(&cpufreq_policy_notifier_list,
-					CPUFREQ_REMOVE_POLICY, data);
 			if (!frozen) {
 				pr_debug("%s: policy Kobject moved to cpu: %d from: %d\n",
 						__func__, new_cpu, cpu);
