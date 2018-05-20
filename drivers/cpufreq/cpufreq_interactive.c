@@ -72,10 +72,10 @@ static spinlock_t speedchange_cpumask_lock;
 static struct mutex gov_lock;
 
 /* Hi speed to bump to from lo speed when load burst (default max) */
-static unsigned int hispeed_freq;
+static unsigned int hispeed_freq = 1134000;
 
 /* Go to hi speed when CPU load at or above this value. */
-#define DEFAULT_GO_HISPEED_LOAD 99
+#define DEFAULT_GO_HISPEED_LOAD 65
 static unsigned long go_hispeed_load = DEFAULT_GO_HISPEED_LOAD;
 
 /* Sampling down factor to be applied to min_sample_time at max freq */
@@ -97,7 +97,7 @@ static unsigned long min_sample_time = DEFAULT_MIN_SAMPLE_TIME;
 /*
  * The sample rate of the timer used to increase frequency
  */
-#define DEFAULT_TIMER_RATE (20 * USEC_PER_MSEC)
+#define DEFAULT_TIMER_RATE (30 * USEC_PER_MSEC)
 static unsigned long timer_rate = DEFAULT_TIMER_RATE;
 
 /* Busy SDF parameters*/
@@ -128,7 +128,7 @@ static u64 boostpulse_endtime;
 #define DEFAULT_TIMER_SLACK (4 * DEFAULT_TIMER_RATE)
 static int timer_slack_val = DEFAULT_TIMER_SLACK;
 
-static bool io_is_busy;
+static bool io_is_busy = true;
 
 /*
  * If the max load among other CPUs is higher than up_threshold_any_cpu_load
@@ -396,7 +396,9 @@ static void cpufreq_interactive_timer(unsigned long data)
 			if (new_freq < this_hispeed_freq)
 				new_freq = this_hispeed_freq;
 		}
-	} else {
+	} else if (cpu_load <= 5)
+		new_freq = pcpu->policy->cpuinfo.min_freq;
+	else {
 		new_freq = choose_freq(pcpu, loadadjfreq);
 		if (new_freq > hispeed_freq && pcpu->target_freq < hispeed_freq)
 			new_freq = hispeed_freq;
