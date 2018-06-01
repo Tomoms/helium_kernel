@@ -2661,10 +2661,4 @@ config ASMP
 	  Automatically hotplugs the multiple cpu cores on and off
 	  based on cpu load and suspend state
 
-config GPU_OVERCLOCK
-	bool "GPU OC"
-	default y
-	help
-		GPUOC
-
 endif
