@@ -3255,7 +3255,17 @@ static struct msm_bus_vectors grp3d_nominal_high_vectors[] = {
 	},
 };
 
+#ifdef CONFIG_GPU_OVERCLOCK
 static struct msm_bus_vectors grp3d_max_vectors[] = {
+	{
+		.src = MSM_BUS_MASTER_GRAPHICS_3D,
+		.dst = MSM_BUS_SLAVE_EBI_CH0,
+		.ab = 0,
+		.ib = KGSL_CONVERT_TO_MBPS(4836),
+	},
+};
+#endif
+static struct msm_bus_vectors grp3d_nominal_veryhigh_vectors[] = {
 	{
 		.src = MSM_BUS_MASTER_GRAPHICS_3D,
 		.dst = MSM_BUS_SLAVE_EBI_CH0,
@@ -3279,7 +3289,11 @@ static struct msm_bus_paths grp3d_bus_scale_usecases[] = {
 	},
 	{
 		ARRAY_SIZE(grp3d_nominal_high_vectors),
-		grp3d_nominal_high_vectors,
+		grp3d_nominal_veryhigh_vectors,
+	},
+	{
+		ARRAY_SIZE(grp3d_nominal_high_vectors),
+		grp3d_nominal_veryhigh_vectors,
 	},
 	{
 		ARRAY_SIZE(grp3d_max_vectors),
@@ -3455,6 +3469,13 @@ static struct kgsl_device_iommu_data kgsl_3d0_iommu_data[] = {
 
 static struct kgsl_device_platform_data kgsl_3d0_pdata = {
 	.pwrlevel = {
+#ifdef CONFIG_GPU_OVERCLOCK
+		{
+			.gpu_freq = 480000000,
+			.bus_freq = 5,
+			.io_fraction = 0,
+		},
+#endif
 		{
 			.gpu_freq = 400000000,
 			.bus_freq = 4,
@@ -3480,8 +3501,8 @@ static struct kgsl_device_platform_data kgsl_3d0_pdata = {
 			.bus_freq = 0,
 		},
 	},
-	.init_level = 4,
-	.num_levels = ARRAY_SIZE(grp3d_freq) + 1,
+	.init_level = 5,
+	.num_levels = ARRAY_SIZE(grp3d_freq) + 2,
 	.set_grp_async = NULL,
 	.idle_timeout = HZ/12,
 	.clk_map = KGSL_CLK_CORE | KGSL_CLK_IFACE | KGSL_CLK_MEM_IFACE,
