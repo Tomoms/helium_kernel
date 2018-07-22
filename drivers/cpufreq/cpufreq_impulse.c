@@ -78,7 +78,7 @@ static unsigned int default_above_hispeed_delay[] = {
 struct cpufreq_impulse_tunables {
 	int usage_count;
 	/* Hi speed to bump to from lo speed when load burst (default max) */
-	unsigned int hispeed_freq = 1134000;
+	unsigned int hispeed_freq;
 	/* Go to hi speed when CPU load at or above this value. */
 #define DEFAULT_GO_HISPEED_LOAD 65
 	unsigned long go_hispeed_load;
@@ -114,7 +114,7 @@ struct cpufreq_impulse_tunables {
 	 */
 #define DEFAULT_TIMER_SLACK (4 * DEFAULT_TIMER_RATE)
 	int timer_slack_val;
-	bool io_is_busy = 1;
+	bool io_is_busy;
 
 	/*
 	 * Whether to align timer windows across all CPUs.
@@ -128,7 +128,7 @@ struct cpufreq_impulse_tunables {
 	unsigned int max_freq_hysteresis;
 
 	/* Improves frequency selection for more energy */
-	bool powersave_bias = 1;
+	bool powersave_bias;
 };
 
 /* For cases where we have single governor instance for system */
@@ -416,10 +416,10 @@ static void cpufreq_impulse_timer(unsigned long data)
 	ppol->last_evaluated_jiffy = get_jiffies_64();
 
 #ifdef CONFIG_STATE_NOTIFIER
-	if (!state_suspended &&
+	if (!scr_suspended &&
 		tunables->timer_rate != tunables->timer_rate_prev)
 		tunables->timer_rate = tunables->timer_rate_prev;
-	else if (state_suspended &&
+	else if (scr_suspended &&
 		tunables->timer_rate != DEFAULT_TIMER_RATE_SUSP) {
 		tunables->timer_rate_prev = tunables->timer_rate;
 		tunables->timer_rate
@@ -469,7 +469,7 @@ static void cpufreq_impulse_timer(unsigned long data)
 	cpufreq_notify_utilization(ppol->policy, cpu_load);
 	tunables->boosted = cpu_load >= tunables->go_hispeed_load;
 #ifdef CONFIG_STATE_NOTIFIER
-	tunables->boosted = tunables->boosted && !state_suspended;
+	tunables->boosted = tunables->boosted && !scr_suspended;
 #endif
 	this_hispeed_freq = max(tunables->hispeed_freq, ppol->policy->min);
 
@@ -609,7 +609,7 @@ static int cpufreq_impulse_speedchange_task(void *data)
  			if (ppol->target_freq != ppol->policy->cur) {
 				tunables = ppol->policy->governor_data;
 #ifdef CONFIG_STATE_NOTIFIER
-				if (tunables->powersave_bias || state_suspended)
+				if (tunables->powersave_bias || scr_suspended)
 #else
 				if (tunables->powersave_bias)
 #endif
