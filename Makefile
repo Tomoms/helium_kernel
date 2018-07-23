@@ -354,7 +354,7 @@ GRAPHITE	= -fgraphite -floop-flatten -floop-parallelize-all \
 		  -floop-nest-optimize
 MACHINE_OPT	= -mcpu=cortex-a15 -mfpu=neon-vfpv4 \
 		  -munaligned-access
-WORKING		= -mvectorize-with-neon-double -fopenmp -fivopts -fsched-pressure -fira-loop-pressure -munaligned-access -ftree-loop-distribution -ftree-loop-ivcanon -ftree-loop-im -fweb -frename-registers -fforce-addr -fgcse-las -fgcse-lm -fgcse-sm -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fsched-spec-load -fsched-spec-load-dangerous -ftree-partial-pre -ftree-vectorize -ftree-loop-vectorize -ftree-slp-vectorize -fvect-cost-model #-fmodulo-sched -fmodulo-sched-allow-regmoves
+WORKING		= -mvectorize-with-neon-double -fopenmp -fivopts -fsched-pressure -fira-loop-pressure -munaligned-access -ftree-loop-distribution -ftree-loop-ivcanon -ftree-loop-im -fweb -frename-registers -fforce-addr -fgcse-las -fgcse-lm -fgcse-sm -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fsched-spec-load -fsched-spec-load-dangerous -ftree-partial-pre -ftree-vectorize -ftree-loop-vectorize -ftree-slp-vectorize -fvect-cost-model -fsingle-precision-constant #-fmodulo-sched -fmodulo-sched-allow-regmoves
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
