@@ -2661,4 +2661,10 @@ config BRICKED_HOTPLUG
 	  This enables kernel based multi core control.
 	  (up/down hotplug based on load)
 
+config CPU_OVERCLOCK
+	bool "CPU overclock"
+	default y
+	help
+		Boost the MSM8960AB SoC to higher frequencies.
+
 endif
