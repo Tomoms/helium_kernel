@@ -1405,7 +1405,6 @@ static int arch_random_refill(void)
 	return n;
 }
 
-
 static ssize_t
 _random_read(int nonblock, char __user *buf, size_t nbytes)
 {
@@ -1435,12 +1434,6 @@ _random_read(int nonblock, char __user *buf, size_t nbytes)
 		if (signal_pending(current))
 			return -ERESTARTSYS;
 	}
-}
-
-static ssize_t
-_random_read(int nonblock, char __user *buf, size_t nbytes)
-{
-	return _random_read(file->f_flags & O_NONBLOCK, buf, nbytes);
 }
 
 static ssize_t
