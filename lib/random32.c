@@ -297,7 +297,7 @@ void prandom_reseed_late(void)
 static int __init prandom_reseed(void)
 {
 	__prandom_reseed(false);
-	prandom_start_seed_timer();
+	__prandom_start_seed_timer();
 	return 0;
 }
 late_initcall(prandom_reseed);
