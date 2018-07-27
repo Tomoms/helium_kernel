@@ -245,8 +245,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc-7
 HOSTCXX      = g++-7
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -pipe -fno-tree-vectorize
-HOSTCXXFLAGS = -O2 -pipe -fno-tree-vectorize
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -pipe -g0
+HOSTCXXFLAGS = -O2 -pipe -g0
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -331,7 +331,7 @@ LD_FLAGS = -O3 --sort-common --strip-debug
 # Make variables (CC, etc...)
 
 AS		= $(CROSS_COMPILE)as
-LD		= $(CROSS_COMPILE)ld $(LD_FLAGS)
+LD		= $(CROSS_COMPILE)ld.gold $(LD_FLAGS)
 CC		= $(CROSS_COMPILE)gcc
 CPP		= $(CC) -E
 AR		= $(CROSS_COMPILE)ar
@@ -354,7 +354,7 @@ GRAPHITE	= -fgraphite -floop-flatten -floop-parallelize-all \
 		  -floop-nest-optimize
 MACHINE_OPT	= -mcpu=cortex-a15 -mfpu=neon-vfpv4 \
 		  -munaligned-access
-WORKING		= -mvectorize-with-neon-double -fopenmp -fivopts -fsched-pressure -fira-loop-pressure -munaligned-access -ftree-loop-distribution -ftree-loop-ivcanon -ftree-loop-im -fweb -frename-registers -fforce-addr -fgcse-las -fgcse-lm -fgcse-sm -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fsched-spec-load -fsched-spec-load-dangerous -ftree-partial-pre -ftree-vectorize -ftree-loop-vectorize -ftree-slp-vectorize -fvect-cost-model -fsingle-precision-constant #-fmodulo-sched -fmodulo-sched-allow-regmoves
+WORKING		= -mvectorize-with-neon-double -fopenmp -fivopts -fsched-pressure -fira-loop-pressure -munaligned-access -ftree-loop-distribution -ftree-loop-ivcanon -ftree-loop-im -fweb -frename-registers -fgcse-las -fgcse-lm -fgcse-sm -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fsched-spec-load -fsched-spec-load-dangerous -ftree-partial-pre -ftree-vectorize -ftree-loop-vectorize -ftree-slp-vectorize -fvect-cost-model -fsingle-precision-constant -fsanitize=leak #-fmodulo-sched -fmodulo-sched-allow-regmoves
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
