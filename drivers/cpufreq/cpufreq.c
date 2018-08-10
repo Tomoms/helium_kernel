@@ -718,12 +718,16 @@ static ssize_t store_vdd_levels(struct kobject *a, struct attribute *b, const ch
 	}
 
 	if (sign != 0) {
-		if (pair[0] > 0)
+		if (pair[0] > 0) {
 			acpuclk_set_vdd(0, sign * pair[0]);
+            printk(KERN_WARNING "Calling set_vdd, case sign != 0");
+        }
 	}
 	else {
-		if ((pair[0] > 0) && (pair[1] > 0))
+		if ((pair[0] > 0) && (pair[1] > 0)) {
 			acpuclk_set_vdd((unsigned)pair[0], pair[1]);
+            printk(KERN_WARNING "Calling set_vdd, case sign == 0");
+        }
 		else
 			return -EINVAL;
 	}
