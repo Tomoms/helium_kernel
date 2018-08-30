@@ -935,8 +935,8 @@ static void __init bus_init(const struct l2_level *l2_level)
 
 #ifdef CONFIG_CPU_VOLTAGE_TABLE
 
-#define HFPLL_MIN_VDD		 800000
-#define HFPLL_MAX_VDD		1350000
+#define HFPLL_MIN_VDD		 700000
+#define HFPLL_MAX_VDD		1450000
 
 ssize_t acpuclk_get_vdd_levels_str(char *buf) {
 
@@ -965,18 +965,22 @@ void acpuclk_set_vdd(unsigned int khz, int vdd_uv) {
 	mutex_lock(&driver_lock);
 
 	for (i = 0; drv.acpu_freq_tbl[i].speed.khz; i++) {
-		if (khz == 0)
+		if (khz == 0) {
 			new_vdd_uv = min(max((unsigned int)(drv.acpu_freq_tbl[i].vdd_core + vdd_uv),
 				(unsigned int)HFPLL_MIN_VDD), (unsigned int)HFPLL_MAX_VDD);
-		else if ( drv.acpu_freq_tbl[i].speed.khz == khz)
+				pr_warn("CPU VOLTAGE CONTROL LOG: CASE khz == 0\n");
+		} else if (drv.acpu_freq_tbl[i].speed.khz == khz) {
 			new_vdd_uv = min(max((unsigned int)vdd_uv,
 				(unsigned int)HFPLL_MIN_VDD), (unsigned int)HFPLL_MAX_VDD);
-		else 
+				pr_warn("CPU VOLTAGE CONTROL LOG: CASE drv.acpu_freq_tbl[i].speed.khz == khz\n");
+		} else {
 			continue;
+			pr_warn("CPU VOLTAGE CONTROL LOG: DEAD CASE\n");
+		}
 
 		drv.acpu_freq_tbl[i].vdd_core = new_vdd_uv;
 	}
-	pr_warn("faux123: user voltage table modified!\n");
+	pr_warn("CPU VOLTAGE CONTROL LOG: faux123: user voltage table modified!\n");
 	mutex_unlock(&driver_lock);
 }
 #endif	/* CONFIG_CPU_VOTALGE_TABLE */
