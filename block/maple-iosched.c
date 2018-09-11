@@ -45,7 +45,7 @@ struct maple_data {
 	int fifo_expire[2][2];
 	int fifo_batch;
 	int writes_starved;
-  int sleep_latency_multiple;
+    int sleep_latency_multiple;
 };
 
 static inline struct maple_data *
@@ -78,8 +78,8 @@ maple_add_request(struct request_queue *q, struct request *rq)
 	struct maple_data *mdata = maple_get_data(q);
 	const int sync = rq_is_sync(rq);
 	const int dir = rq_data_dir(rq);
-	const bool display_on = scr_suspended;
-
+    const bool suspended = is_suspended();
+    
 	/*
 	 * Add request to the proper fifo list and set its
 	 * expire time.
@@ -87,10 +87,10 @@ maple_add_request(struct request_queue *q, struct request *rq)
 
    	/* inrease expiration when device is asleep */
    	unsigned int fifo_expire_suspended = mdata->fifo_expire[sync][dir] * sleep_latency_multiple;
-   	if (display_on && mdata->fifo_expire[sync][dir]) {
+   	if (!suspended && mdata->fifo_expire[sync][dir]) {
    		rq_set_fifo_time(rq, jiffies + mdata->fifo_expire[sync][dir]);
    		list_add_tail(&rq->queuelist, &mdata->fifo_list[sync][dir]);
-   	} else if (!display_on && fifo_expire_suspended) {
+   	} else if (suspended && fifo_expire_suspended) {
    		rq_set_fifo_time(rq, jiffies + fifo_expire_suspended);
    		list_add_tail(&rq->queuelist, &mdata->fifo_list[sync][dir]);
    	}
@@ -371,7 +371,7 @@ static struct elv_fs_entry maple_attrs[] = {
 	DD_ATTR(async_write_expire),
 	DD_ATTR(fifo_batch),
 	DD_ATTR(writes_starved),
-  DD_ATTR(sleep_latency_multiple),
+    DD_ATTR(sleep_latency_multiple),
 	__ATTR_NULL
 };
 

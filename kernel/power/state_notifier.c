@@ -102,6 +102,11 @@ static void _resume_work(struct work_struct *work)
 	dprintk("%s: resume completed.\n", STATE_NOTIFIER);
 }
 
+bool is_suspended(void)
+{
+    return state_suspended;
+}
+
 void state_suspend(void)
 {
 	if (state_suspended || suspend_in_progress)
