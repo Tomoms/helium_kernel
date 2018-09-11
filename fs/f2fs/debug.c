@@ -11,13 +11,13 @@
  * published by the Free Software Foundation.
  */
 
+#include <linux/export.h>
 #include <linux/fs.h>
 #include <linux/backing-dev.h>
 #include <linux/f2fs_fs.h>
 #include <linux/blkdev.h>
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
-#include <linux/export.h>
 
 #include "f2fs.h"
 #include "node.h"
@@ -46,7 +46,6 @@ static void update_general_status(struct f2fs_sb_info *sbi)
 	si->ndirty_dent = get_pages(sbi, F2FS_DIRTY_DENTS);
 	si->ndirty_meta = get_pages(sbi, F2FS_DIRTY_META);
 	si->ndirty_data = get_pages(sbi, F2FS_DIRTY_DATA);
-	si->ndirty_imeta = get_pages(sbi, F2FS_DIRTY_IMETA);
 	si->ndirty_dirs = sbi->ndirty_inode[DIR_INODE];
 	si->ndirty_files = sbi->ndirty_inode[FILE_INODE];
 	si->ndirty_all = sbi->ndirty_inode[DIRTY_META];

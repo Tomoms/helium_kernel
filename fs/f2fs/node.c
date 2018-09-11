@@ -64,6 +64,8 @@ bool available_free_memory(struct f2fs_sb_info *sbi, int type)
 		res = mem_size < ((avail_ram * nm_i->ram_thresh / 100) >> 2);
 		if (excess_cached_nats(sbi))
 			res = false;
+		if (nm_i->nat_cnt > DEF_NAT_CACHE_THRESHOLD)
+			res = false;
 	} else if (type == DIRTY_DENTS) {
 		if (sbi->sb->s_bdi->dirty_exceeded)
 			return false;
@@ -1405,10 +1407,7 @@ continue_unlock:
 				unlock_page(page);
 				f2fs_put_page(last_page, 0);
 				break;
-			} else {
-				nwritten++;
 			}
-
 			if (page == last_page) {
 				f2fs_put_page(page, 0);
 				marked = true;
@@ -1443,7 +1442,6 @@ int sync_node_pages(struct f2fs_sb_info *sbi, struct writeback_control *wbc)
 	struct pagevec pvec;
 	int step = 0;
 	int nwritten = 0;
-	int ret = 0;
 
 	pagevec_init(&pvec, 0);
 
@@ -1464,8 +1462,7 @@ next_step:
 
 			if (unlikely(f2fs_cp_error(sbi))) {
 				pagevec_release(&pvec);
-				ret = -EIO;
-				goto out;
+				return -EIO;
 			}
 
 			/*
@@ -1516,8 +1513,6 @@ continue_unlock:
 
 			if (NODE_MAPPING(sbi)->a_ops->writepage(page, wbc))
 				unlock_page(page);
-			else
-				nwritten++;
 
 			if (--wbc->nr_to_write == 0)
 				break;
@@ -1535,10 +1530,7 @@ continue_unlock:
 		step++;
 		goto next_step;
 	}
-out:
-	if (nwritten)
-		f2fs_submit_merged_bio(sbi, NODE, WRITE);
-	return ret;
+	return nwritten;
 }
 
 int wait_on_node_pages_writeback(struct f2fs_sb_info *sbi, nid_t ino)
@@ -1896,7 +1888,7 @@ bool alloc_nid(struct f2fs_sb_info *sbi, nid_t *nid)
 	struct free_nid *i = NULL;
 retry:
 #ifdef CONFIG_F2FS_FAULT_INJECTION
-	if (time_to_inject(sbi, FAULT_ALLOC_NID))
+	if (time_to_inject(FAULT_ALLOC_NID))
 		return false;
 #endif
 	spin_lock(&nm_i->nid_list_lock);
@@ -2078,12 +2070,10 @@ int recover_inode_page(struct f2fs_sb_info *sbi, struct page *page)
 
 	if (unlikely(old_ni.blk_addr != NULL_ADDR))
 		return -EINVAL;
-retry:
+
 	ipage = f2fs_grab_cache_page(NODE_MAPPING(sbi), ino, false);
-	if (!ipage) {
-		congestion_wait(BLK_RW_ASYNC, msecs_to_jiffies(20));
-		goto retry;
-	}
+	if (!ipage)
+		return -ENOMEM;
 
 	/* Should not use this inode from free nid list */
 	remove_free_nid(sbi, ino);
