@@ -10,6 +10,8 @@ struct state_event {
 	void *data;
 };
 
+bool is_suspended(void);
+
 extern bool scr_suspended;
 extern void state_suspend(void);
 extern void state_resume(void);
