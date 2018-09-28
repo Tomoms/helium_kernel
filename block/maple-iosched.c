@@ -12,6 +12,7 @@
  * expirations when power is suspended to decrease workload.
  */
 #include <linux/blkdev.h>
+#include <linux/kernel.h>
 #include <linux/elevator.h>
 #include <linux/bio.h>
 #include <linux/module.h>
@@ -45,7 +46,7 @@ struct maple_data {
 	int fifo_expire[2][2];
 	int fifo_batch;
 	int writes_starved;
-  int sleep_latency_multiple;
+	int sleep_latency_multiple;
 };
 
 static inline struct maple_data *
@@ -78,7 +79,7 @@ maple_add_request(struct request_queue *q, struct request *rq)
 	struct maple_data *mdata = maple_get_data(q);
 	const int sync = rq_is_sync(rq);
 	const int dir = rq_data_dir(rq);
-	const bool display_on = scr_suspended;
+	const bool display_on = !scr_suspended;
 
 	/*
 	 * Add request to the proper fifo list and set its
@@ -90,9 +91,11 @@ maple_add_request(struct request_queue *q, struct request *rq)
    	if (display_on && mdata->fifo_expire[sync][dir]) {
    		rq_set_fifo_time(rq, jiffies + mdata->fifo_expire[sync][dir]);
    		list_add_tail(&rq->queuelist, &mdata->fifo_list[sync][dir]);
+		printk(KERN_WARNING "Device is active! I'm not multiplying");
    	} else if (!display_on && fifo_expire_suspended) {
    		rq_set_fifo_time(rq, jiffies + fifo_expire_suspended);
    		list_add_tail(&rq->queuelist, &mdata->fifo_list[sync][dir]);
+		printk(KERN_WARNING "Device is suspended! I'm multiplying");
    	}
 }
 
@@ -205,7 +208,7 @@ maple_dispatch_requests(struct request_queue *q, int force)
 	struct maple_data *mdata = maple_get_data(q);
 	struct request *rq = NULL;
 	int data_dir = READ;
-	const bool display_on = scr_suspended;
+	const bool display_on = !scr_suspended;
 
 	/*
 	 * Retrieve any expired request after a batch of
@@ -314,6 +317,7 @@ maple_var_store(int *var, const char *page, size_t count)
 	char *p = (char *) page;
 
 	*var = simple_strtol(p, &p, 10);
+	printk(KERN_WARNING "Someone is annoyingly changing some tunables! Fuck off!");
 	return count;
 }
 
@@ -371,7 +375,7 @@ static struct elv_fs_entry maple_attrs[] = {
 	DD_ATTR(async_write_expire),
 	DD_ATTR(fifo_batch),
 	DD_ATTR(writes_starved),
-  DD_ATTR(sleep_latency_multiple),
+	DD_ATTR(sleep_latency_multiple),
 	__ATTR_NULL
 };
 
