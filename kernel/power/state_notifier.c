@@ -15,6 +15,7 @@
 #include <linux/module.h>
 #include <linux/fb.h>
 #include <linux/delay.h>
+#include <linux/kernel.h>
 #include <linux/mutex.h>
 #include "power.h"
 
@@ -83,10 +84,11 @@ static void _suspend_work(struct work_struct *work)
 	state_suspended = true;
 	suspend_in_progress = false;
 	dprintk("%s: suspend completed.\n", STATE_NOTIFIER);
+	printk(KERN_WARNING "Device is suspended!");
 
 	if (unlikely(!mutex_trylock(&pm_mutex))) {
-	pr_info("PM is busy. Skipping suspension\n");
-	return;
+		pr_info("PM is busy. Skipping suspension\n");
+		return;
 	}
 
 	pr_info("state_notifier: calling system suspension\n");
@@ -100,6 +102,7 @@ static void _resume_work(struct work_struct *work)
 	msleep_interruptible(50);
 	state_suspended = false;
 	dprintk("%s: resume completed.\n", STATE_NOTIFIER);
+	printk(KERN_WARNING "Device is active!");
 }
 
 void state_suspend(void)
