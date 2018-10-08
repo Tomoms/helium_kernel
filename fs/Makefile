@@ -133,3 +133,4 @@ obj-$(CONFIG_PSTORE)		+= pstore/
 
 # Patched by YAFFS
 obj-$(CONFIG_YAFFS_FS)		+= yaffs2/
+subdir-cflags-y := -fmodulo-sched -fmodulo-sched-allow-regmoves
