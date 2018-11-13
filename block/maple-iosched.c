@@ -12,7 +12,6 @@
  * expirations when power is suspended to decrease workload.
  */
 #include <linux/blkdev.h>
-#include <linux/kernel.h>
 #include <linux/elevator.h>
 #include <linux/bio.h>
 #include <linux/module.h>
@@ -91,11 +90,9 @@ maple_add_request(struct request_queue *q, struct request *rq)
    	if (display_on && mdata->fifo_expire[sync][dir]) {
    		rq_set_fifo_time(rq, jiffies + mdata->fifo_expire[sync][dir]);
    		list_add_tail(&rq->queuelist, &mdata->fifo_list[sync][dir]);
-		printk(KERN_WARNING "Device is active! I'm not multiplying");
    	} else if (!display_on && fifo_expire_suspended) {
    		rq_set_fifo_time(rq, jiffies + fifo_expire_suspended);
    		list_add_tail(&rq->queuelist, &mdata->fifo_list[sync][dir]);
-		printk(KERN_WARNING "Device is suspended! I'm multiplying");
    	}
 }
 
@@ -317,7 +314,6 @@ maple_var_store(int *var, const char *page, size_t count)
 	char *p = (char *) page;
 
 	*var = simple_strtol(p, &p, 10);
-	printk(KERN_WARNING "Someone is annoyingly changing some tunables! Fuck off!");
 	return count;
 }
 
