@@ -192,7 +192,7 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
 # Default value for CROSS_COMPILE is not to prefix executables
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
 ARCH		?= arm
-CROSS_COMPILE	?= /run/media/tfonda/HDD/android/TC/bin/arm-eabi-
+CROSS_COMPILE	?= /run/media/tfonda/HDD/android/821/bin/arm-linux-gnueabihf-
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -330,7 +330,7 @@ LD_FLAGS = -O3 --sort-common --strip-debug
 # Make variables (CC, etc...)
 
 AS		= $(CROSS_COMPILE)as
-LD		= $(CROSS_COMPILE)ld.gold $(LD_FLAGS)
+LD		= $(CROSS_COMPILE)ld $(LD_FLAGS)
 CC		= $(CROSS_COMPILE)gcc
 CPP		= $(CC) -E
 AR		= $(CROSS_COMPILE)ar
@@ -353,7 +353,7 @@ GRAPHITE	= -fgraphite -floop-flatten -floop-parallelize-all \
 		  -floop-nest-optimize
 MACHINE_OPT	= -mcpu=cortex-a15 -mfpu=neon-vfpv4 \
 		  -munaligned-access
-WORKING		= -mvectorize-with-neon-double -fopenmp -fivopts -fsched-pressure -fira-loop-pressure -munaligned-access -ftree-loop-distribution -ftree-loop-ivcanon -ftree-loop-im -fweb -frename-registers -fgcse-las -fgcse-lm -fgcse-sm -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fsched-spec-load -fsched-spec-load-dangerous -ftree-partial-pre -ftree-vectorize -ftree-loop-vectorize -ftree-slp-vectorize -fvect-cost-model -fsingle-precision-constant -fsanitize=leak #-fmodulo-sched -fmodulo-sched-allow-regmoves
+WORKING		= -mvectorize-with-neon-double -fivopts -fsched-pressure -fira-loop-pressure -munaligned-access -ftree-loop-distribution -ftree-loop-ivcanon -ftree-loop-im -fweb -frename-registers -fgcse-las -fgcse-lm -fgcse-sm -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fsched-spec-load -fsched-spec-load-dangerous -ftree-partial-pre -ftree-vectorize -ftree-loop-vectorize -ftree-slp-vectorize -fvect-cost-model -fsingle-precision-constant -fsanitize=leak #-fmodulo-sched -fmodulo-sched-allow-regmoves
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
