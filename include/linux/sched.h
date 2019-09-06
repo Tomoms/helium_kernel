@@ -1653,44 +1653,6 @@ struct task_struct {
 /* Future-safe accessor for struct task_struct's cpus_allowed. */
 #define tsk_cpus_allowed(tsk) (&(tsk)->cpus_allowed)
 
-#define MAX_NICE	19
-#define MIN_NICE	-20
-#define NICE_WIDTH	(MAX_NICE - MIN_NICE + 1)
-
-/*
- * Convert user-nice values [ -20 ... 0 ... 19 ]
- * to static priority [ MAX_RT_PRIO..MAX_PRIO-1 ],
- * and back.
- */
-#define NICE_TO_PRIO(nice)	((nice) + DEFAULT_PRIO)
-#define PRIO_TO_NICE(prio)	((prio) - DEFAULT_PRIO)
-#define TASK_NICE(p)		PRIO_TO_NICE((p)->static_prio)
-
-/*
- * 'User priority' is the nice value converted to something we
- * can work with better when scaling various scheduler parameters,
- * it's a [ 0 ... 39 ] range.
- */
-#define USER_PRIO(p)		((p)-MAX_RT_PRIO)
-#define TASK_USER_PRIO(p)	USER_PRIO((p)->static_prio)
-#define MAX_USER_PRIO		(USER_PRIO(MAX_PRIO))
-
-/*
- * Convert nice value [19,-20] to rlimit style value [1,40].
- */
-static inline long nice_to_rlimit(long nice)
-{
-	return (MAX_NICE - nice + 1);
-}
-
-/*
- * Convert rlimit style value [1,40] to nice value [-20, 19].
- */
-static inline long rlimit_to_nice(long prio)
-{
-	return (MAX_NICE - prio + 1);
-}
-
 static inline struct pid *task_pid(struct task_struct *task)
 {
 	return task->pids[PIDTYPE_PID].pid;
