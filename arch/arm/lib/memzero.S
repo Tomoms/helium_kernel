@@ -20,8 +20,9 @@ THUMB(	.p2align 2	)
 
 ENTRY(__memzero)
 	ands	r3, r0, #3
+	mov	ip, r0
 	mov	r2, #0
-	bne	7f
+	bne	8f
 
 /*
  * we know that the pointer in r0 is aligned to a word boundary.
@@ -74,9 +75,9 @@ ENTRY(__memzero)
 
 	pop	{r5}
 	/* Early exit if there are 0 bytes left. */
-THUMB(	cbz	r1, 9f	)
+THUMB(	cbz	r1, 7f	)
 ARM(	teq	r1, #0	)
-ARM(	beq	9f	)
+ARM(	beq	7f	)
 
 	/* Handle 8-64 bytes. */
 4:	bic	r4, r1, #7
@@ -101,6 +102,7 @@ ARM(	lsrs	r4, r4, #1	)
 	strge	r2, [r0], #4
 	/* Early exit for multiple of 4 size. */
 	ands	r1, r1, #3
+	moveq	r0, ip
 	moveq	pc, lr
 
 	/*
@@ -110,10 +112,15 @@ ARM(	lsrs	r4, r4, #1	)
 6:	cmp	r1, #2
 	strhge	r2, [r0], #2
 	strbne	r2, [r0]
+	mov	r0, ip
 	mov	pc, lr
 
-7:	cmp	r1, #4
-	blt	8f
+7:	pop	{r4}
+	mov	r0, ip
+	mov	pc, lr
+
+8:	cmp	r1, #4
+	blt	9f
 	cmp	r3, #2
 	sub	r1, r1, #4
 	strble	r2, [r0]
@@ -124,15 +131,11 @@ ARM(	lsrs	r4, r4, #1	)
 	b	1b
 
 	/* 0 to 3 bytes left. */
-8:	cmp	r1, #2
+9:	cmp	r1, #2
 	strbge	r2, [r0]
 	strbge	r2, [r0, #1]
 	addge	r0, r0, #2
 	tst	r1, #1
 	strbne	r2, [r0]
 	mov	pc, lr
-
-9:	pop	{r4}
-	mov     pc, lr
-
 ENDPROC(__memzero)
