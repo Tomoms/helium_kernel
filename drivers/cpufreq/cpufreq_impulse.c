@@ -406,7 +406,7 @@ static void cpufreq_impulse_timer(unsigned long data)
 		return;
 	if (!ppol->governor_enabled)
 		goto exit;
-	if (pcpu->policy->min == pcpu->policy->max)
+	if (ppol->policy->min == ppol->policy->max)
 		goto rearm;
 
 	if (cpu_is_offline(data))
