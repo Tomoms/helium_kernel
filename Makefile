@@ -380,6 +380,11 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   $(WORKING) \
 		   $(GRAPHITE)
 
+KBUILD_CFLAGS	+=	--param inline-min-speedup=15 \
+			--param max-inline-insns-single=200 \
+			--param max-inline-insns-auto=30 \
+			--param early-inlining-insns=14
+
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS   := -D__ASSEMBLY__
