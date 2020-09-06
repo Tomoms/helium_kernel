@@ -353,7 +353,7 @@ GRAPHITE	= -fgraphite -floop-flatten -floop-parallelize-all \
 		  -floop-nest-optimize
 MACHINE_OPT	= -mcpu=cortex-a15 -mfpu=neon-vfpv4 \
 		  -munaligned-access
-WORKING		= -mvectorize-with-neon-double -fivopts -fsched-pressure -fira-loop-pressure -munaligned-access -ftree-loop-distribution -ftree-loop-ivcanon -ftree-loop-im -fweb -frename-registers -fgcse-las -fgcse-lm -fgcse-sm -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fsched-spec-load -fsched-spec-load-dangerous -ftree-partial-pre -ftree-loop-vectorize -ftree-slp-vectorize -fvect-cost-model -fsingle-precision-constant -fsanitize=leak -fno-inline-functions #-fmodulo-sched -fmodulo-sched-allow-regmoves
+OTHER		= -mvectorize-with-neon-double -fsingle-precision-constant
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
@@ -377,8 +377,9 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-delete-null-pointer-checks \
 		   -Wno-maybe-uninitialized \
 		   -Wno-logical-not-parentheses \
-		   $(WORKING) \
-		   $(GRAPHITE)
+		   $(OTHER) \
+		   $(GRAPHITE) \
+		   $(MACHINE_OPT)
 
 KBUILD_CFLAGS	+=	--param inline-min-speedup=15 \
 			--param max-inline-insns-single=200 \
