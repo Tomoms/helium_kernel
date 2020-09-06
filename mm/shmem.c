@@ -1894,7 +1894,7 @@ static loff_t shmem_file_llseek(struct file *file, loff_t offset, int origin)
 
 	if (origin != SEEK_DATA && origin != SEEK_HOLE)
 		return generic_file_llseek_size(file, offset, origin,
-					MAX_LFS_FILESIZE);
+					MAX_LFS_FILESIZE, i_size_read(inode));
 	mutex_lock(&inode->i_mutex);
 	/* We're holding i_mutex so we can access i_size directly */
 
