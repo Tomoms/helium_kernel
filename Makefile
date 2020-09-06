@@ -330,7 +330,7 @@ LD_FLAGS = -O3 --sort-common --strip-debug
 # Make variables (CC, etc...)
 
 AS		= $(CROSS_COMPILE)as
-LD		= $(CROSS_COMPILE)ld $(LD_FLAGS)
+LD		= $(CROSS_COMPILE)ld.gold $(LD_FLAGS)
 CC		= $(CROSS_COMPILE)gcc
 CPP		= $(CC) -E
 AR		= $(CROSS_COMPILE)ar
