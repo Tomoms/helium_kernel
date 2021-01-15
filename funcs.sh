@@ -6,7 +6,7 @@ setenv () {
 }
 
 checkenv () {
-	if [[ $ARCH != "arm" ]] || [[ $SUBARCH != "arm" ]] || [[ $CROSS_COMPILE != "../../arm32-gcc/bin/arm-eabi-" ]]; then
+	if [[ $ARCH != "arm" ]] || [[ $SUBARCH != "arm" ]] || [[ $CROSS_COMPILE != "/run/media/tfonda/LinuxData/android/lineage-17.1/prebuilts/gcc/linux-x86/arm/arm32-gcc/bin/arm-eabi-" ]]; then
 		echo "Environment variables are unset!"
 		return 1
 	fi
