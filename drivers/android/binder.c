@@ -72,6 +72,7 @@
 #include <linux/spinlock.h>
 #include <linux/ratelimit.h>
 #include <linux/types.h>
+#include <linux/sched/rt.h>
 
 #include <uapi/linux/android/binder.h>
 

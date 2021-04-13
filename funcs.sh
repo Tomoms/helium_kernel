@@ -56,9 +56,7 @@ editcfg () {
 	fi
 	if [ -f ".config" ]; then
 		echo ".config exists"
-		patch -p1 < 0001-temp-to-build-on-SUSE.patch
 		make nconfig
-		git checkout scripts/kconfig/nconf.c
 	else
 		echo ".config not found, run mkcfg first!"
 		return 1

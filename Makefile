@@ -377,6 +377,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-delete-null-pointer-checks \
 		   -Wno-maybe-uninitialized \
 		   -Wno-logical-not-parentheses \
+		   -Wno-deprecated-declarations \
 		   $(OTHER) \
 		   $(GRAPHITE) \
 		   $(MACHINE_OPT)
